@@ -16,11 +16,12 @@ export const metadata: Metadata = {
 };
 
 interface PacotesPageProps {
-    searchParams: { page?: string };
+    searchParams: Promise<{ page?: string }>;
 }
 
 export default async function pacotesPage({ searchParams }: PacotesPageProps) {
-    const currentPage = parseInt(searchParams.page || "1", 10);
+    const params = await searchParams;
+    const currentPage = parseInt(params.page || "1", 10);
     const limit = 6;
 
     const [carteiras, pedidos, signatureData] = await Promise.all([
@@ -63,7 +64,7 @@ export default async function pacotesPage({ searchParams }: PacotesPageProps) {
                     hasNextPage={meta.current_page < meta.last_page}
                     hasPrevPage={meta.current_page > 1}
                     baseUrl="/pacotes"
-                    searchParams={searchParams}
+                    searchParams={params}
                 />
             </section>
             <div className="space-y-4">

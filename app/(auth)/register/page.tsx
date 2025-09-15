@@ -5,7 +5,7 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { requestVerificationCode, register } from "@/lib/auth";
+import { requestVerificationCode, register, signIn } from "@/lib/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
@@ -67,10 +67,15 @@ export default function RegisterPage() {
         const result = await register(formDataObj);
 
         if (result.success) {
-            setSuccess(result.message);
-            setTimeout(() => {
-                redirect("/login");
-            }, 2000);
+            const result = await signIn(formDataObj);
+            if (result.success) {
+                redirect("/");
+            } else {
+                setError(result.message || "Ocorreu um erro ao fazer login");
+                if (result.errors) {
+                    setFieldErrors(result.errors);
+                }
+            }
         } else {
             setError(result.message || "Ocorreu um erro ao criar a conta");
             if (result.errors) {

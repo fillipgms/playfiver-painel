@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import chroma from "chroma-js";
 import { twMerge } from "tailwind-merge";
 
-const LineGraph = ({
+const LineGraphComponent = ({
     data,
 }: {
     data: {
@@ -12,9 +12,10 @@ const LineGraph = ({
     }[];
 }) => {
     const [colors, setColors] = useState<string[]>([]);
-    const totalCount = data.reduce(
-        (sum, uniqueData) => sum + uniqueData.count,
-        0
+
+    const totalCount = useMemo(
+        () => data.reduce((sum, uniqueData) => sum + uniqueData.count, 0),
+        [data]
     );
 
     useEffect(() => {
@@ -51,14 +52,14 @@ const LineGraph = ({
 
                     return (
                         <div
-                            key={i}
+                            key={bar.game_name}
                             style={{
                                 width: `${percent}%`,
                                 background: colors[i],
                                 transition: "background 0.3s",
                             }}
                             className="h-2.5"
-                            title={`${bar.count}: ${bar.count} (${percent}%)`}
+                            title={`${bar.game_name}: ${bar.count} (${percent}%)`}
                         ></div>
                     );
                 })}
@@ -66,7 +67,7 @@ const LineGraph = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.map((uniqueData, i) => (
                     <div
-                        key={i}
+                        key={uniqueData.game_name}
                         className={twMerge(
                             "flex justify-between items-center gap-2 px-3 py-2 rounded-lg  shadow-sm transition",
                             i === 0 && data.length % 2 !== 0
@@ -94,5 +95,7 @@ const LineGraph = ({
         </div>
     );
 };
+
+const LineGraph = React.memo(LineGraphComponent);
 
 export default LineGraph;

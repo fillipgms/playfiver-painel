@@ -22,7 +22,6 @@ const Badge = ({
         {children}
     </div>
 );
-
 const Game = ({
     game,
     id,
@@ -34,14 +33,26 @@ const Game = ({
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [alignRight, setAlignRight] = useState(false);
+    const [verticalAlign, setVerticalAlign] = useState<"top" | "bottom" | null>(
+        null
+    );
     const [isPinned, setIsPinned] = useState(false);
 
     useEffect(() => {
         const checkPosition = () => {
             if (containerRef.current) {
                 const rect = containerRef.current.getBoundingClientRect();
-                const hasSpaceRight = rect.right + 260 < window.innerWidth;
-                setAlignRight(!hasSpaceRight);
+
+                if (window.innerWidth <= 768) {
+                    const hasSpaceBottom =
+                        rect.bottom + 260 < window.innerHeight;
+                    setVerticalAlign(hasSpaceBottom ? "bottom" : "top");
+                    setAlignRight(false);
+                } else {
+                    setVerticalAlign(null);
+                    const hasSpaceRight = rect.right + 260 < window.innerWidth;
+                    setAlignRight(!hasSpaceRight);
+                }
             }
         };
 
@@ -92,8 +103,16 @@ const Game = ({
 
             <div
                 id={`info-${id}`}
-                className={`absolute top-1/2 w-60 -translate-y-1/2 z-20 p-4 rounded-md bg-background-primary space-y-2
-          ${alignRight ? "right-[110%]" : "left-[110%]"}
+                className={`absolute w-60 z-20 p-4 rounded-md bg-background-primary space-y-2
+          ${
+              verticalAlign
+                  ? verticalAlign === "bottom"
+                      ? "top-[110%] left-1/2 -translate-x-1/2"
+                      : "bottom-[110%] left-1/2 -translate-x-1/2"
+                  : alignRight
+                  ? "right-[110%] top-1/2 -translate-y-1/2"
+                  : "left-[110%] top-1/2 -translate-y-1/2"
+          }
           ${
               isPinned || isPinnedForced
                   ? "block pointer-events-auto"

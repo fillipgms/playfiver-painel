@@ -4,11 +4,16 @@ import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { NextStep, NextStepProvider } from "nextstepjs";
-import { steps, useFirstVisitTour } from "@/data/toursteps";
+import {
+    steps,
+    useFirstVisitTour,
+    useSidebarMobileTourStep,
+} from "@/data/toursteps";
 import TourCard from "@/components/TourCard";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const isSidebarMobileStep = useSidebarMobileTourStep();
 
     useFirstVisitTour();
 
@@ -17,8 +22,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex min-h-svh">
-            <script src="//code.jivosite.com/widget/m6Yo5Xus8f" async></script>
-            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+            {/* <script src="//code.jivosite.com/widget/m6Yo5Xus8f" async></script> */}
+            <Sidebar
+                isOpen={isSidebarOpen || isSidebarMobileStep}
+                onClose={closeSidebar}
+            />
             <div id="home-component" className="flex-1 flex flex-col min-h-svh">
                 <Header onMenuToggle={toggleSidebar} />
                 <div

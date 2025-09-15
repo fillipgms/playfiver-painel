@@ -361,7 +361,7 @@ const Form = ({
                                     Jogos com Bônus
                                 </span>
                                 <p className="text-xs text-foreground/60">
-                                    Habilitar jogos que oferecem bônus
+                                    Habilitar bônus nos jogos que oferecem bônus
                                 </p>
                             </div>
                         </div>

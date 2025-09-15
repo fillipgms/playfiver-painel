@@ -214,7 +214,7 @@ export const steps: Tour[] = [
                     </>
                 ),
                 selector: "#influencers-section",
-                side: "right",
+                side: "top",
                 showControls: true,
                 showSkip: false,
                 pointerPadding: 10,
@@ -232,7 +232,7 @@ export const steps: Tour[] = [
                     </>
                 ),
                 selector: "#transactions-section",
-                side: "left",
+                side: "top",
                 showControls: true,
                 showSkip: false,
                 pointerPadding: 10,
@@ -429,4 +429,20 @@ export const useGameTourStep = () => {
     }, [currentStep]);
 
     return isGameStep;
+};
+
+export const useSidebarMobileTourStep = () => {
+    const { currentStep } = useNextStep();
+    const [isSidebarMobileStep, setIsSidebarMobileStep] = useState(false);
+
+    useEffect(() => {
+        if (currentStep !== null && currentStep !== undefined) {
+            const sidebarMobileStepIndex = [1, 2, 3, 5, 13, 16, 18, 19];
+            setIsSidebarMobileStep(
+                sidebarMobileStepIndex.includes(currentStep)
+            );
+        }
+    }, [currentStep]);
+
+    return isSidebarMobileStep;
 };

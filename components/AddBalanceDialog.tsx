@@ -15,7 +15,14 @@ import Button from "./Button";
 import { getWalletGGr } from "@/actions/carteiras";
 import { createOrder, getOrderStatus } from "@/actions/orders";
 import { twMerge } from "tailwind-merge";
-import { IMaskInput } from "react-imask";
+import dynamic from "next/dynamic";
+const IMaskInput = dynamic(
+    () => import("react-imask").then((m) => m.IMaskInput),
+    {
+        ssr: false,
+        loading: () => null,
+    }
+);
 
 type PaymentType = "pix" | "crypto";
 
@@ -38,6 +45,7 @@ interface AddBalanceDialogProps {
     walletType: number;
     cpf?: string;
     triggerClassName?: string;
+    disabled?: boolean;
 }
 
 const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
@@ -45,6 +53,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     walletType,
     cpf = "",
     triggerClassName,
+    disabled = false,
 }) => {
     const [open, setOpen] = useState(false);
     const [ggrTable, setGgrTable] = useState<GgrTableProps[]>([]);
@@ -52,11 +61,14 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     const [paymentType, setPaymentType] = useState<PaymentType>("pix");
     const [cpfValue, setCpfValue] = useState<string>("");
     const [submitting, setSubmitting] = useState(false);
+    const [apiError, setApiError] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+
     type OrderResponse = {
-        id?: string | number;
-        qrcode?: string;
-        qrcode_base64?: string;
-        payment_url?: string;
+        id?: string | number | null;
+        qrcode?: string | null;
+        qrcode64?: string | null;
+        payment_url?: string | null;
     } | null;
     const [orderResponse, setOrderResponse] = useState<OrderResponse>(null);
     const [orderId, setOrderId] = useState<string>("");
@@ -89,32 +101,53 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     }, [ggrTable, amountNumber]);
 
     const fichaValue = useMemo(() => {
-        if (amountNumber <= 0 || currentGgr <= 0) return 0;
-        const tax = currentGgr / 100;
-        return +(amountNumber / (1 + tax)).toFixed(2);
-    }, [amountNumber, currentGgr]);
+        if (amountNumber <= 0) return 0;
+
+        const taxaAplicada = ggrTable.find(
+            (taxa) => amountNumber >= parseFloat(taxa.above)
+        );
+        let ggrValue;
+        if (taxaAplicada) {
+            ggrValue = taxaAplicada.tax;
+        } else {
+            ggrValue = 13;
+        }
+
+        const ggr_decimal = ggrValue / 100;
+        const valor_ajustado = amountNumber / ggr_decimal;
+
+        if (!isNaN(valor_ajustado)) {
+            return valor_ajustado;
+        }
+
+        return 0;
+    }, [amountNumber, ggrTable]);
 
     const submit = async () => {
         setSubmitting(true);
         setOrderResponse(null);
         setStatus(null);
+        setApiError(null);
+        setCopied(false);
+
         try {
             const payload = {
                 cpf:
                     paymentType === "pix"
                         ? cpfValue.replace(/\D/g, "") || cpf
-                        : cpf,
+                        : "",
                 type: paymentType,
                 amount: Math.max(amountNumber, 0),
                 typeWallet: walletType,
-            } as const;
-            const data = (await createOrder(
-                payload
-            )) as unknown as OrderResponse;
+            };
+
+            const data = (await createOrder(payload)) as OrderResponse;
             setOrderResponse(data);
+
             if (data?.id) setOrderId(String(data.id));
         } catch (e) {
             console.error(e);
+            setApiError("Erro ao criar o pedido. Tente novamente.");
         } finally {
             setSubmitting(false);
         }
@@ -133,10 +166,36 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
         return () => clearInterval(interval);
     }, [orderId]);
 
+    const hasOrder = !!orderResponse;
+
+    const handleCopyPix = async () => {
+        if (!orderResponse?.qrcode) return;
+        try {
+            await navigator.clipboard.writeText(orderResponse.qrcode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch {}
+    };
+
+    const resetFlow = () => {
+        setOrderResponse(null);
+        setOrderId("");
+        setStatus(null);
+        setSubmitting(false);
+        setApiError(null);
+        setCopied(false);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={disabled ? false : open}
+            onOpenChange={(v) => !disabled && setOpen(v)}
+        >
             <DialogTrigger asChild>
-                <Button className={twMerge("w-full", triggerClassName)}>
+                <Button
+                    disabled={disabled}
+                    className={twMerge("w-full", triggerClassName)}
+                >
                     Adicionar Saldo
                 </Button>
             </DialogTrigger>
@@ -165,6 +224,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             placeholder="Ex: 100,00"
                             value={amount}
                             onAccept={(val: string) => setAmount(val)}
+                            disabled={hasOrder || submitting}
                             className="w-full rounded-md border border-foreground/20 px-3 py-2 outline-hidden focus:ring-2 focus:ring-foreground/30"
                         />
                         <p className="text-xs text-foreground/60">
@@ -187,52 +247,62 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                         )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="space-y-1 p-3 rounded-md bg-foreground/5 border border-foreground/10">
-                            <p className="text-foreground/60">Valor em ficha</p>
-                            <p className="font-semibold">
-                                {formatCurrencyBRL(fichaValue)}
-                            </p>
+                    {!hasOrder && (
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div className="space-y-1 p-3 rounded-md bg-foreground/5 border border-foreground/10">
+                                <p className="text-foreground/60">
+                                    Valor em ficha
+                                </p>
+                                <p className="font-semibold">
+                                    {formatCurrencyBRL(fichaValue)}
+                                </p>
+                            </div>
+                            <div className="space-y-1 p-3 rounded-md bg-foreground/5 border border-foreground/10">
+                                <p className="text-foreground/60">
+                                    GGR aplicado
+                                </p>
+                                <p className="font-semibold">{currentGgr}%</p>
+                            </div>
                         </div>
-                        <div className="space-y-1 p-3 rounded-md bg-foreground/5 border border-foreground/10">
-                            <p className="text-foreground/60">GGR aplicado</p>
-                            <p className="font-semibold">{currentGgr}%</p>
-                        </div>
-                    </div>
+                    )}
 
-                    <div>
-                        <p className="text-sm font-medium mb-2">Tabela GGR</p>
-                        <div className="space-y-2 max-h-40 overflow-auto pr-1">
-                            {[...ggrTable]
-                                .sort(
-                                    (a, b) =>
-                                        parseFloat(b.above) -
-                                        parseFloat(a.above)
-                                )
-                                .map((row) => (
-                                    <div
-                                        key={row.id}
-                                        className={twMerge(
-                                            "flex items-center justify-between text-sm border rounded-md px-3 py-2",
-                                            amountNumber >=
-                                                parseFloat(row.above)
-                                                ? "border-[#95BD2B]/40 bg-[#95BD2B]/5"
-                                                : "border-foreground/10 bg-foreground/5"
-                                        )}
-                                    >
-                                        <span>
-                                            Acima de{" "}
-                                            {formatCurrencyBRL(
-                                                parseFloat(row.above)
+                    {!hasOrder && (
+                        <div>
+                            <p className="text-sm font-medium mb-2">
+                                Tabela GGR
+                            </p>
+                            <div className="space-y-2 max-h-40 overflow-auto pr-1">
+                                {[...ggrTable]
+                                    .sort(
+                                        (a, b) =>
+                                            parseFloat(b.above) -
+                                            parseFloat(a.above)
+                                    )
+                                    .map((row) => (
+                                        <div
+                                            key={row.id}
+                                            className={twMerge(
+                                                "flex items-center justify-between text-sm border rounded-md px-3 py-2",
+                                                amountNumber >=
+                                                    parseFloat(row.above)
+                                                    ? "border-[#95BD2B]/40 bg-[#95BD2B]/5"
+                                                    : "border-foreground/10 bg-foreground/5"
                                             )}
-                                        </span>
-                                        <span className="font-semibold">
-                                            {row.tax}%
-                                        </span>
-                                    </div>
-                                ))}
+                                        >
+                                            <span>
+                                                Acima de{" "}
+                                                {formatCurrencyBRL(
+                                                    parseFloat(row.above)
+                                                )}
+                                            </span>
+                                            <span className="font-semibold">
+                                                {row.tax}%
+                                            </span>
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="space-y-2">
                         <p className="text-sm font-medium">
@@ -246,7 +316,10 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                         ? "border-[#95BD2B] bg-[#95BD2B]/10"
                                         : "border-foreground/10 bg-foreground/5"
                                 )}
-                                onClick={() => setPaymentType("pix")}
+                                onClick={() =>
+                                    !hasOrder && setPaymentType("pix")
+                                }
+                                disabled={hasOrder || submitting}
                             >
                                 Pix
                             </button>
@@ -257,7 +330,10 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                         ? "border-[#95BD2B] bg-[#95BD2B]/10"
                                         : "border-foreground/10 bg-foreground/5"
                                 )}
-                                onClick={() => setPaymentType("crypto")}
+                                onClick={() =>
+                                    !hasOrder && setPaymentType("crypto")
+                                }
+                                disabled={hasOrder || submitting}
                             >
                                 Crypto
                             </button>
@@ -274,6 +350,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                 placeholder="000.000.000-00"
                                 value={cpfValue}
                                 onAccept={(val: string) => setCpfValue(val)}
+                                disabled={hasOrder || submitting}
                                 className="w-full rounded-md border border-foreground/20 px-3 py-2 outline-hidden focus:ring-2 focus:ring-foreground/30"
                             />
                             {cpfValue &&
@@ -289,11 +366,11 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                         <div className="space-y-2 border rounded-md p-3 border-foreground/10">
                             {paymentType === "pix" ? (
                                 <>
-                                    {orderResponse?.qrcode_base64 && (
+                                    {orderResponse?.qrcode64 && (
                                         <div className="w-full max-w-[220px] mx-auto rounded overflow-hidden">
                                             <Image
                                                 alt="QR Code Pix"
-                                                src={`data:image/png;base64,${orderResponse.qrcode_base64}`}
+                                                src={`data:image/png;base64,${orderResponse.qrcode64}`}
                                                 width={220}
                                                 height={220}
                                                 className="w-full h-auto"
@@ -302,23 +379,53 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                         </div>
                                     )}
                                     {orderResponse?.qrcode && (
-                                        <p className="text-xs break-all bg-foreground/5 p-2 rounded">
-                                            {orderResponse.qrcode}
-                                        </p>
+                                        <div className="space-y-2">
+                                            <p className="text-xs break-all bg-foreground/5 p-2 rounded">
+                                                {orderResponse.qrcode}
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={handleCopyPix}
+                                                    className="text-xs px-2 py-1 rounded border border-foreground/20 hover:bg-foreground/5"
+                                                >
+                                                    {copied
+                                                        ? "Copiado"
+                                                        : "Copiar código Pix"}
+                                                </button>
+                                            </div>
+                                        </div>
                                     )}
+                                    {!orderResponse?.qrcode64 &&
+                                        !orderResponse?.qrcode && (
+                                            <p className="text-xs text-foreground/60">
+                                                QR Code indisponível no momento.
+                                                Tente novamente.
+                                            </p>
+                                        )}
                                 </>
+                            ) : orderResponse?.payment_url ? (
+                                <a
+                                    className="text-sm underline text-primary"
+                                    href={orderResponse.payment_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Abrir link de pagamento
+                                </a>
                             ) : (
-                                orderResponse?.payment_url && (
-                                    <a
-                                        className="text-sm underline text-primary"
-                                        href={orderResponse.payment_url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        Abrir link de pagamento
-                                    </a>
-                                )
+                                <p className="text-xs text-foreground/60">
+                                    Link de pagamento indisponível. Tente
+                                    novamente.
+                                </p>
                             )}
+                            <div className="pt-2">
+                                <button
+                                    onClick={resetFlow}
+                                    className="text-xs underline text-foreground/70"
+                                >
+                                    Gerar outro pagamento
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -331,6 +438,8 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                         </div>
                     )}
                 </div>
+
+                {apiError && <div className="text-[#E53935]">{apiError}</div>}
 
                 <DialogFooter>
                     <Button

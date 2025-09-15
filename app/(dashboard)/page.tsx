@@ -81,40 +81,49 @@ export default async function Home() {
                 </CardHeader>
                 <CardContent>
                     <ul className="flex flex-col gap-3">
-                        {provedores_views.map((provider) => {
-                            const max = Math.max(
-                                ...provedores_views.map((p) => p.count)
+                        {(() => {
+                            const maxCount = provedores_views.reduce(
+                                (currentMax, provider) =>
+                                    provider.count > currentMax
+                                        ? provider.count
+                                        : currentMax,
+                                0
                             );
-                            const percent = (provider.count / max) * 100;
+                            return provedores_views.map((provider) => {
+                                const percent =
+                                    maxCount > 0
+                                        ? (provider.count / maxCount) * 100
+                                        : 0;
 
-                            return (
-                                <li
-                                    key={provider.game_name}
-                                    className="flex flex-col sm:flex-row sm:items-center gap-2 w-full"
-                                >
-                                    <span className="text-xs sm:text-sm font-medium min-w-0 flex-shrink-0">
-                                        {provider.game_name}
-                                    </span>
-                                    <div className="flex-1 flex items-center gap-2">
-                                        <div className="flex-1 justify-end flex h-2">
-                                            <div
-                                                className="h-full rounded-full justify-end bg-primary transition-all duration-300"
-                                                style={{
-                                                    width: `${percent}%`,
-                                                    minWidth:
-                                                        provider.count > 0
-                                                            ? "2px"
-                                                            : "0px",
-                                                }}
-                                            />
-                                        </div>
-                                        <span className="whitespace-nowrap text-xs text-muted-foreground min-w-[30px] text-right">
-                                            {provider.count} visualizações
+                                return (
+                                    <li
+                                        key={provider.game_name}
+                                        className="flex flex-col sm:flex-row sm:items-center gap-2 w-full"
+                                    >
+                                        <span className="text-xs sm:text-sm font-medium min-w-0 flex-shrink-0">
+                                            {provider.game_name}
                                         </span>
-                                    </div>
-                                </li>
-                            );
-                        })}
+                                        <div className="flex-1 flex items-center gap-2">
+                                            <div className="flex-1 justify-end flex h-2">
+                                                <div
+                                                    className="h-full rounded-full justify-end bg-primary transition-all duration-300"
+                                                    style={{
+                                                        width: `${percent}%`,
+                                                        minWidth:
+                                                            provider.count > 0
+                                                                ? "2px"
+                                                                : "0px",
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="whitespace-nowrap text-xs text-muted-foreground min-w-[30px] text-right">
+                                                {provider.count} visualizações
+                                            </span>
+                                        </div>
+                                    </li>
+                                );
+                            });
+                        })()}
                     </ul>
                 </CardContent>
             </Card>

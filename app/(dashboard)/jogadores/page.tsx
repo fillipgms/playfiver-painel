@@ -45,7 +45,7 @@ export default async function JogadoresPage({
                     </CardHeader>
                     <CardContent>
                         <span className="text-2xl font-bold">
-                            {res.players}
+                            {res.players > 0 ? res.players : 0}
                         </span>
                     </CardContent>
                 </Card>
@@ -59,7 +59,7 @@ export default async function JogadoresPage({
                     </CardHeader>
                     <CardContent>
                         <span className="text-2xl font-bold">
-                            {res.players_active}
+                            {res.players_active > 0 ? res.players_active : 0}
                         </span>
                     </CardContent>
                 </Card>
@@ -73,7 +73,9 @@ export default async function JogadoresPage({
                     </CardHeader>
                     <CardContent>
                         <span className="text-2xl font-bold">
-                            {res.players_influencers}
+                            {res.players_influencers > 0
+                                ? res.players_influencers
+                                : 0}
                         </span>
                     </CardContent>
                 </Card>
@@ -87,7 +89,10 @@ export default async function JogadoresPage({
                     </CardHeader>
                     <CardContent>
                         <span className="text-2xl font-bold">
-                            {Number(res.players_rtp).toFixed(2)}%
+                            {Number(res.players_rtp) > 0
+                                ? Number(res.players_rtp).toFixed(2)
+                                : 0}
+                            %
                         </span>
                     </CardContent>
                 </Card>

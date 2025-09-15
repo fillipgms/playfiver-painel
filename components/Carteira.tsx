@@ -1,4 +1,6 @@
-import React from "react";
+"use client"; // 🔹 importante para habilitar client-side fetch
+
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "./Card";
 import AddBalanceDialog from "./AddBalanceDialog";
 import AgentList from "./AgentList";
@@ -7,8 +9,8 @@ import {
     ArrowUpIcon,
     EqualsIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import { getWalletGGr } from "@/actions/carteiras";
 import { twMerge } from "tailwind-merge";
+import { getWalletGGr } from "@/actions/carteiras"; // 👈 client-side
 
 const formatCurrencyBRL = (value: number): string =>
     new Intl.NumberFormat("pt-BR", {
@@ -54,68 +56,88 @@ const parseWalletBalance = (value?: string): number => {
     return parseFloat(cleaned) || 0;
 };
 
-const GgrBadge = async ({
-    idBadge,
+const GgrBadge = ({
     id,
     saldo,
+    ggrTable,
+    isLoading,
 }: {
-    idBadge: number;
     id: string;
     saldo: number;
+    ggrTable?: GgrTableProps[];
+    isLoading: boolean;
 }) => {
-    try {
-        const ggrTable = (await getWalletGGr(idBadge)) as GgrTableProps[];
-
-        if (!ggrTable || !Array.isArray(ggrTable)) {
-            return null;
-        }
-
-        const getGgrRate = (balance: number): number => {
-            const sortedLevels = [...ggrTable].sort(
-                (a, b) => parseFloat(b.above) - parseFloat(a.above)
-            );
-
-            for (const level of sortedLevels) {
-                if (balance >= parseFloat(level.above)) {
-                    return level.tax;
-                }
-            }
-            return 0;
-        };
-
-        const ggrRate = getGgrRate(saldo);
-
-        if (ggrRate <= 0) {
-            return null;
-        }
-
+    if (isLoading) {
         return (
             <div
                 id={id}
-                className="bg-primary text-background-primary rounded py-1 px-2 text-xs font-medium"
-                role="status"
-                aria-label={`Taxa GGR atual: ${ggrRate}%`}
+                className="bg-muted text-muted-foreground rounded py-1 px-2 text-xs font-medium animate-pulse"
+                aria-label="Carregando taxa GGR"
             >
-                GGR Atual: {ggrRate}%
+                Carregando GGR...
             </div>
         );
-    } catch (error) {
-        console.error("Error fetching GGR data:", error);
-        return null;
     }
+
+    if (!ggrTable || ggrTable.length === 0) return null;
+
+    const sortedLevels = [...ggrTable].sort(
+        (a, b) => parseFloat(b.above) - parseFloat(a.above)
+    );
+
+    let ggrRate = 0;
+    for (const level of sortedLevels) {
+        if (saldo >= parseFloat(level.above)) {
+            ggrRate = level.tax;
+            break;
+        }
+    }
+
+    if (ggrRate <= 0) return null;
+
+    return (
+        <div
+            id={id}
+            className="bg-primary text-background-primary rounded py-1 px-2 text-xs font-medium"
+            role="status"
+            aria-label={`Taxa GGR atual: ${ggrRate}%`}
+        >
+            GGR Atual: {ggrRate}%
+        </div>
+    );
 };
 
 const TARGET_BALANCE = 100;
 
-const Carteira = async ({
+const Carteira = ({
     carteira,
     index,
 }: {
     carteira: WalletProps;
     index: number;
 }) => {
+    const [ggrTable, setGgrTable] = useState<GgrTableProps[] | undefined>();
+    const [loadingGGR, setLoadingGGR] = useState(true);
+
     const saldo = parseWalletBalance(carteira.saldo);
     const progress = Math.min((saldo / TARGET_BALANCE) * 100, 100);
+
+    useEffect(() => {
+        const fetchGGR = async () => {
+            try {
+                const ggr = (await getWalletGGr(
+                    carteira.id
+                )) as GgrTableProps[];
+                setGgrTable(ggr);
+            } catch {
+                setGgrTable([]);
+            } finally {
+                setLoadingGGR(false);
+            }
+        };
+
+        fetchGGR();
+    }, [carteira.id]);
 
     const { totalGanhos, totalPerdidos } = carteira.agents.reduce(
         (acc, agent) => {
@@ -134,8 +156,6 @@ const Carteira = async ({
 
     const isDisabled = carteira.status !== 1;
 
-    console.log(carteira);
-
     return (
         <Card className={isDisabled ? "opacity-50 cursor-not-allowed" : ""}>
             <CardHeader>
@@ -143,8 +163,9 @@ const Carteira = async ({
                     <h3 className="font-bold text-base">{carteira.name}</h3>
                     <GgrBadge
                         id={`wallet-badge-${index}`}
-                        idBadge={carteira.id}
                         saldo={saldo}
+                        ggrTable={ggrTable}
+                        isLoading={loadingGGR}
                     />
                 </div>
             </CardHeader>
@@ -162,9 +183,7 @@ const Carteira = async ({
                             <span className="font-bold">
                                 {formatCurrencyBRL(saldo)}
                             </span>
-                            <span className="">
-                                / {formatCurrencyBRL(TARGET_BALANCE)}
-                            </span>
+                            <span>/ {formatCurrencyBRL(TARGET_BALANCE)}</span>
                         </div>
                     </div>
 
@@ -209,10 +228,7 @@ const Carteira = async ({
                                 </>
                             ) : (
                                 <>
-                                    <EqualsIcon
-                                        className="text-foreground/50"
-                                        aria-hidden="true"
-                                    />
+                                    <EqualsIcon className="text-foreground/50" />
                                     <p className="text-base font-bold text-foreground/50">
                                         R$ 0,00
                                     </p>
@@ -239,10 +255,7 @@ const Carteira = async ({
                                 </>
                             ) : (
                                 <>
-                                    <EqualsIcon
-                                        className="text-foreground/50"
-                                        aria-hidden="true"
-                                    />
+                                    <EqualsIcon className="text-foreground/50" />
                                     <p className="text-base font-bold text-foreground/50">
                                         R$ 0,00
                                     </p>
@@ -263,20 +276,12 @@ const Carteira = async ({
                     <AddBalanceDialog
                         walletId={carteira.id}
                         walletType={carteira.id}
+                        disabled={isDisabled}
                         triggerClassName={twMerge(
                             "w-full",
                             isDisabled ? "opacity-50 cursor-not-allowed " : ""
                         )}
                     />
-                    {/* <Button
-                        variant="secondary"
-                        disabled={isDisabled}
-                        className={
-                            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-                        }
-                    >
-                        Ver Jogos
-                    </Button> */}
                 </section>
             </CardContent>
         </Card>

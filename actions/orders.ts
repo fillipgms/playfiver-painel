@@ -63,6 +63,8 @@ export async function createOrder(payload: {
             throw new Error("No valid data received from API");
         }
 
+        console.log(data);
+
         return data;
     } catch (error) {
         console.error("Failed to create order:", error);

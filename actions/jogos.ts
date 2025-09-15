@@ -2,6 +2,26 @@
 import axios from "axios";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import { unstable_cache } from "next/cache";
+
+const fetchGamesCached = unstable_cache(
+    async (accessToken: string, queryString: string) => {
+        const { data } = await axios.get(
+            `https://api.testeplayfiver.com/api/panel/games?${queryString}`,
+            {
+                timeout: 5000,
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        if (!data) throw new Error("No valid data received from API");
+        return data as GamesResponse;
+    },
+    ["games-data"],
+    { revalidate: 120 }
+);
 
 export async function getGamesData(
     filters: GamesFilters = {}
@@ -25,22 +45,8 @@ export async function getGamesData(
         if (filters.bonus !== undefined)
             params.append("bonus", filters.bonus.toString());
 
-        const { data } = await axios.get(
-            `https://api.testeplayfiver.com/api/panel/games?${params.toString()}`,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
-                },
-            }
-        );
-
-        if (!data) {
-            throw new Error("No valid data received from API");
-        }
-
-        return data as GamesResponse;
+        const queryString = params.toString();
+        return await fetchGamesCached(session?.accessToken ?? "", queryString);
     } catch (error) {
         console.error("Failed to fetch games data:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })

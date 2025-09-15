@@ -80,3 +80,26 @@ export async function getSession() {
     }
     return JSON.parse(cookie) as SessionPayload;
 }
+
+export async function forgotPassword(email: string) {
+    try {
+        const response = await axios.post(
+            `https://api.testeplayfiver.com/api/auth/forgot-password`,
+            { email }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                (await cookies()).delete("session");
+                throw new Error(
+                    "Sessão expirada. Por favor, faça login novamente."
+                );
+            }
+        }
+
+        console.error("Failed to get user:", error);
+
+        return null;
+    }
+}
