@@ -22,7 +22,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex min-h-svh">
-            {/* <script src="//code.jivosite.com/widget/m6Yo5Xus8f" async></script> */}
+            <script src="//code.jivosite.com/widget/m6Yo5Xus8f" async></script>
             <Sidebar
                 isOpen={isSidebarOpen || isSidebarMobileStep}
                 onClose={closeSidebar}

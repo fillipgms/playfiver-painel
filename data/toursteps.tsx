@@ -438,9 +438,35 @@ export const useSidebarMobileTourStep = () => {
     useEffect(() => {
         if (currentStep !== null && currentStep !== undefined) {
             const sidebarMobileStepIndex = [1, 2, 3, 5, 13, 16, 18, 19];
-            setIsSidebarMobileStep(
-                sidebarMobileStepIndex.includes(currentStep)
-            );
+            const isSidebarStep = sidebarMobileStepIndex.includes(currentStep);
+            setIsSidebarMobileStep(isSidebarStep);
+
+            if (isSidebarStep) {
+                const stepToElementId: Record<number, string> = {
+                    1: "sidebar",
+                    2: "link-",
+                    3: "link-agentes",
+                    5: "link-pacotes",
+                    13: "link-jogos",
+                    16: "link-jogadores",
+                    18: "link-transacoes",
+                    19: "link-ipwhitelist",
+                };
+
+                const targetId = stepToElementId[currentStep];
+
+                if (targetId) {
+                    const timer = setTimeout(() => {
+                        const el = document.getElementById(targetId);
+                        el?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                        });
+                    }, 350);
+
+                    return () => clearTimeout(timer);
+                }
+            }
         }
     }, [currentStep]);
 
