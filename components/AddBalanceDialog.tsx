@@ -17,6 +17,7 @@ import { createOrder, getOrderStatus } from "@/actions/orders";
 import { twMerge } from "tailwind-merge";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 const IMaskInput = dynamic(
     () => import("react-imask").then((m) => m.IMaskInput),
     {
@@ -56,6 +57,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     triggerClassName,
     disabled = false,
 }) => {
+    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [ggrTable, setGgrTable] = useState<GgrTableProps[]>([]);
     const [amount, setAmount] = useState<string>("");
@@ -165,6 +167,8 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                 if (!notifiedPaid) {
                     toast.success("Pagamento confirmado!");
                     setNotifiedPaid(true);
+                    router.refresh();
+                    setOpen(false);
                     setOrderId("");
                 }
             } catch (e) {
@@ -172,7 +176,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [orderId, notifiedPaid]);
+    }, [orderId, notifiedPaid, router]);
 
     const hasOrder = !!orderResponse;
 

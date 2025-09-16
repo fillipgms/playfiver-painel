@@ -28,6 +28,7 @@ import {
 
 type PaymentType = "pix" | "crypto";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface BuyInfluencerDialogProps {
     signatureData: SignatureResponse;
@@ -40,6 +41,7 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
     cpf = "",
     triggerClassName,
 }) => {
+    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [quantity, setQuantity] = useState<number>(1);
     const [paymentType, setPaymentType] = useState<PaymentType>("pix");
@@ -104,6 +106,8 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
                 if (!notifiedPaid) {
                     toast.success("Pagamento confirmado!");
                     setNotifiedPaid(true);
+                    router.refresh();
+                    setOpen(false);
                     setOrderId("");
                 }
             } catch (e) {
@@ -111,7 +115,7 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [orderId, notifiedPaid]);
+    }, [orderId, notifiedPaid, router]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
