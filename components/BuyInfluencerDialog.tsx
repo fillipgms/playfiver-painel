@@ -12,7 +12,10 @@ import {
     DialogDescription,
 } from "./ui/dialog";
 import Button from "./Button";
-import { createInfluencerOrder } from "@/actions/signature";
+import {
+    createInfluencerOrder,
+    getInfluencerOrderStatus,
+} from "@/actions/signature";
 import { twMerge } from "tailwind-merge";
 import { IMaskInput } from "react-imask";
 import {
@@ -24,6 +27,7 @@ import {
 } from "./ui/select";
 
 type PaymentType = "pix" | "crypto";
+import { toast } from "sonner";
 
 interface BuyInfluencerDialogProps {
     signatureData: SignatureResponse;
@@ -46,6 +50,7 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
         useState<InfluencerOrderResponse | null>(null);
     const [orderId, setOrderId] = useState<string>("");
     const [status, setStatus] = useState<Record<string, unknown> | null>(null);
+    const [notifiedPaid, setNotifiedPaid] = useState(false);
 
     const influencerPrice = parseFloat(signatureData.prices.inf);
     const totalPrice = influencerPrice * quantity;
@@ -93,13 +98,20 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
         if (!orderId) return;
         const interval = setInterval(async () => {
             try {
-                console.log("Checking order status for:", orderId);
+                const data = await getInfluencerOrderStatus(orderId);
+                setStatus(data);
+
+                if (!notifiedPaid) {
+                    toast.success("Pagamento confirmado!");
+                    setNotifiedPaid(true);
+                    setOrderId("");
+                }
             } catch (e) {
                 console.error(e);
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [orderId]);
+    }, [orderId, notifiedPaid]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

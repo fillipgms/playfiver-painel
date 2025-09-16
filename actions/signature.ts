@@ -84,3 +84,40 @@ export async function createInfluencerOrder(payload: {
         );
     }
 }
+
+export async function getInfluencerOrderStatus(id: string | number) {
+    const session = await getSession();
+
+    try {
+        const { data } = await axios.get(
+            `https://api.playfivers.com/api/panel/signature?id=${id}`,
+            {
+                timeout: 5000,
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${session?.accessToken}`,
+                },
+            }
+        );
+
+        if (!data) {
+            throw new Error("No valid data received from API");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch influencer order status:", error);
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
+
+        throw new Error(
+            apiMessage ||
+                getFriendlyHttpErrorMessage(
+                    error,
+                    "Falha ao buscar status do pedido de influencer"
+                )
+        );
+    }
+}

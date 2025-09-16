@@ -16,6 +16,7 @@ import { getWalletGGr } from "@/actions/carteiras";
 import { createOrder, getOrderStatus } from "@/actions/orders";
 import { twMerge } from "tailwind-merge";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 const IMaskInput = dynamic(
     () => import("react-imask").then((m) => m.IMaskInput),
     {
@@ -73,6 +74,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     const [orderResponse, setOrderResponse] = useState<OrderResponse>(null);
     const [orderId, setOrderId] = useState<string>("");
     const [status, setStatus] = useState<Record<string, unknown> | null>(null);
+    const [notifiedPaid, setNotifiedPaid] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -159,12 +161,18 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
             try {
                 const data = await getOrderStatus(orderId);
                 setStatus(data);
+
+                if (!notifiedPaid) {
+                    toast.success("Pagamento confirmado!");
+                    setNotifiedPaid(true);
+                    setOrderId("");
+                }
             } catch (e) {
                 console.error(e);
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [orderId]);
+    }, [orderId, notifiedPaid]);
 
     const hasOrder = !!orderResponse;
 
@@ -184,6 +192,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
         setSubmitting(false);
         setApiError(null);
         setCopied(false);
+        setNotifiedPaid(false);
     };
 
     return (
