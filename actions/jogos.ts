@@ -7,7 +7,7 @@ import { unstable_cache } from "next/cache";
 const fetchGamesCached = unstable_cache(
     async (accessToken: string, queryString: string) => {
         const { data } = await axios.get(
-            `https://api.testeplayfiver.com/api/panel/games?${queryString}`,
+            `https://api.playfivers.com/api/panel/games?${queryString}`,
             {
                 timeout: 5000,
                 headers: {

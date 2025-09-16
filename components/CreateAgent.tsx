@@ -493,7 +493,7 @@ const CreateAgent = ({
             </Dialog>
 
             <Drawer open={Boolean(!isDesktop && open)} onOpenChange={setOpen}>
-                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 overflow-y-auto after:hidden">
+                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 max-h-[90vh] overflow-y-auto after:hidden">
                     <DrawerTitle className="sr-only">Criar Agente</DrawerTitle>
                     <Form
                         onClose={handleClose}

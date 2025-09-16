@@ -3,8 +3,6 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, ToasterProps } from "sonner";
 
-//test
-
 const Toaster = ({ ...props }: ToasterProps) => {
     const { theme = "system" } = useTheme();
 

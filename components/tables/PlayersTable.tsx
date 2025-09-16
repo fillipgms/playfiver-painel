@@ -125,13 +125,15 @@ const cols: ColDef<PlayerProps>[] = [
         field: "valor_ganho",
         flex: 1,
         minWidth: 120,
-        cellStyle: (p) => {
+        cellClass: (p) => {
             const value = parseFloat(
                 p.value?.replace("R$", "").replace(",", ".") || "0"
             );
-            return {
-                color: value > 0 ? "#95BD2B" : value < 0 ? "#E53935" : "#ccc",
-            };
+            return value > 0
+                ? "text-[#95BD2B] bg-background-primary"
+                : value < 0
+                ? "text-[#E53935] bg-background-primary "
+                : "text-foreground bg-background-primary";
         },
     },
     {

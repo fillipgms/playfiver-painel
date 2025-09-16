@@ -79,6 +79,11 @@ interface GameProps {
     created_at: string;
 }
 
+interface WalletResponseProps {
+    status: number;
+    data: WalletProps[];
+}
+
 interface WalletProps {
     id: number;
     name: string;
