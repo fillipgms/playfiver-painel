@@ -1,11 +1,11 @@
 import axios from "axios";
-import { deleteSession } from "./session";
+import { clearExpiredSession } from "@/actions/user";
 
 export async function redirectOnAuthError(error: unknown) {
     if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 401 || status === 403) {
-            await deleteSession();
+            await clearExpiredSession();
         }
     }
 }
