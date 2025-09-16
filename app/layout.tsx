@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 
 import { Metadata, Viewport } from "next";
 import { SessionProvider } from "@/contexts/SessionContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const selawik = localFont({
     src: [
@@ -67,6 +68,7 @@ export default function RootLayout({
                 className={`${selawik.className} antialiased bg-background-secondary text-foreground`}
             >
                 <SessionProvider>{children}</SessionProvider>
+                <Toaster richColors closeButton />
             </body>
         </html>
     );

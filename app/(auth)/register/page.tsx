@@ -9,6 +9,7 @@ import { requestVerificationCode, register, signIn } from "@/lib/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
@@ -16,6 +17,8 @@ export default function RegisterPage() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
         {}
     );
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [step, setStep] = useState<"form" | "verification">("form");
     const [formData, setFormData] = useState({
         name: "",
@@ -220,13 +223,31 @@ export default function RegisterPage() {
                             <label className="capitalize" htmlFor="password">
                                 Senha
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    id="password"
+                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    aria-label={
+                                        showPassword
+                                            ? "Ocultar senha"
+                                            : "Mostrar senha"
+                                    }
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
                             {fieldErrors.password && (
                                 <p className="text-sm text-[#E53935]">
                                     {fieldErrors.password[0]}
@@ -241,13 +262,37 @@ export default function RegisterPage() {
                             >
                                 Repetir Senha
                             </label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                id="confirmPassword"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
+                            <div className="relative">
+                                <input
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    name="confirmPassword"
+                                    id="confirmPassword"
+                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    aria-label={
+                                        showConfirmPassword
+                                            ? "Ocultar confirmação"
+                                            : "Mostrar confirmação"
+                                    }
+                                    onClick={() =>
+                                        setShowConfirmPassword((v) => !v)
+                                    }
+                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                >
+                                    {showConfirmPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
                             {fieldErrors.confirmPassword && (
                                 <p className="text-sm text-[#E53935]">
                                     {fieldErrors.confirmPassword[0]}

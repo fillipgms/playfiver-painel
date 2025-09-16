@@ -36,3 +36,44 @@ export async function getPlayersData(page: number = 1, search: string = "") {
         );
     }
 }
+
+export async function updatePlayer(params: {
+    id: number;
+    rtp?: string;
+    influencer?: number;
+}) {
+    const session = await getSession();
+
+    try {
+        const payload: { id: number; rtp?: string; influencer?: number } = {
+            id: params.id,
+        };
+
+        if (typeof params.rtp !== "undefined") payload.rtp = params.rtp;
+        if (typeof params.influencer !== "undefined")
+            payload.influencer = params.influencer;
+
+        const { data } = await axios.put(
+            `https://api.testeplayfiver.com/api/panel/player`,
+            payload,
+            {
+                timeout: 5000,
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${session?.accessToken}`,
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        console.error("Failed to update player:", error);
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
+
+        throw new Error(
+            apiMessage ||
+                getFriendlyHttpErrorMessage(error, "Falha ao atualizar jogador")
+        );
+    }
+}

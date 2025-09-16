@@ -638,7 +638,7 @@ const EditAgent = ({ agent, onClose, onSuccess }: EditAgentProps) => {
             </Dialog>
 
             <Drawer open={Boolean(!isDesktop)} onOpenChange={onClose}>
-                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 max-h-[90vh] overflow-y-auto">
+                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] after:hidden mx-auto p-5 max-h-[90vh] overflow-y-auto">
                     <DrawerTitle className="sr-only">Editar agente</DrawerTitle>
                     <EditAgentForm
                         agent={agent}

@@ -36,9 +36,7 @@ export default function ForgotPasswordPage() {
             <div className="md:w-1/2 w-full flex justify-center items-center">
                 <form onSubmit={onSubmit} className="space-y-8 w-xs">
                     <div>
-                        <h1 className="font-bold text-xl">
-                            Bem vindo de volta
-                        </h1>
+                        <h1 className="font-bold text-xl">Esqueceu a senha?</h1>
                         <p></p>
                     </div>
                     <div className="space-y-4">
