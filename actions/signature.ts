@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 
 export async function getSignatureData() {
     const session = await getSession();
@@ -27,6 +30,8 @@ export async function getSignatureData() {
         console.error("Failed to fetch home data:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||

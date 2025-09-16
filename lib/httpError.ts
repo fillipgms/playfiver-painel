@@ -1,4 +1,14 @@
 import axios from "axios";
+import { deleteSession } from "./session";
+
+export async function redirectOnAuthError(error: unknown) {
+    if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+            await deleteSession();
+        }
+    }
+}
 
 export function getFriendlyHttpErrorMessage(error: unknown, context?: string) {
     const prefix = context ? `${context}: ` : "";

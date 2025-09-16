@@ -2,7 +2,10 @@
 import axios from "axios";
 import { getSession } from "./user";
 import { deleteSession } from "@/lib/session";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
 const fetchHomeDataCached = unstable_cache(
@@ -37,14 +40,10 @@ export async function getHomeData() {
     } catch (error) {
         console.error("Failed to fetch home data:", error);
         const err = error as unknown;
-        const status = (err as { response?: { status?: number } }).response
-            ?.status;
         const apiMessage = (err as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        if (status === 401 || status === 403) {
-            await deleteSession();
-        }
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||

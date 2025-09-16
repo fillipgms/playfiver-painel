@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 
 export async function getPlayersData(page: number = 1, search: string = "") {
     const session = await getSession();
@@ -29,6 +32,8 @@ export async function getPlayersData(page: number = 1, search: string = "") {
         console.error("Failed to fetch players:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||
@@ -82,6 +87,7 @@ export async function updatePlayer(params: {
         };
         const apiMessage =
             err?.response?.data?.msg || err?.response?.data?.message;
+        await redirectOnAuthError(error);
         return {
             success: false,
             status: err?.response?.status,

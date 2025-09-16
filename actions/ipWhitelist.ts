@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 
 export async function getIpWhitelist(page: number = 1, search: string = "") {
     const session = await getSession();
@@ -29,6 +32,8 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
         console.error("Failed to fetch IP whitelist:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||
@@ -66,6 +71,8 @@ export async function createNewIp(payload: { ip: string }) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
+        await redirectOnAuthError(error);
+
         throw new Error(
             apiMessage ||
                 getFriendlyHttpErrorMessage(
@@ -100,6 +107,8 @@ export async function deleteIp(id: number) {
         console.error("Failed to delete IP from whitelist:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||

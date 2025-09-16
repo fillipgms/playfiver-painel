@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
 const fetchGamesCached = unstable_cache(
@@ -51,6 +54,8 @@ export async function getGamesData(
         console.error("Failed to fetch games data:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||

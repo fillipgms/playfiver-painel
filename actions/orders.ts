@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 
 export async function getOrdersData() {
     const session = await getSession();
@@ -27,6 +30,8 @@ export async function getOrdersData() {
         console.error("Failed to fetch consuption data:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||
@@ -71,6 +76,8 @@ export async function createOrder(payload: {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
+        await redirectOnAuthError(error);
+
         throw new Error(
             apiMessage ||
                 getFriendlyHttpErrorMessage(error, "Falha ao criar pedido")
@@ -102,6 +109,8 @@ export async function getOrderStatus(id: string | number) {
         console.error("Failed to fetch order status:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||

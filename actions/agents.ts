@@ -1,7 +1,10 @@
 "use server";
 import axios from "axios";
 import { getSession } from "./user";
-import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
+import {
+    getFriendlyHttpErrorMessage,
+    redirectOnAuthError,
+} from "@/lib/httpError";
 
 export async function getAgentsData({
     page = 1,
@@ -35,6 +38,8 @@ export async function getAgentsData({
         console.error("Failed to fetch agents:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||
@@ -99,6 +104,8 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                 error as { response?: { data?: { msg?: string } } }
             )?.response?.data?.msg;
 
+            await redirectOnAuthError(error);
+
             throw new Error(
                 apiMessage ||
                     getFriendlyHttpErrorMessage(error, "Falha ao criar agente")
@@ -153,6 +160,8 @@ export async function updateAgent(
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
+        await redirectOnAuthError(error);
+
         throw new Error(
             apiMessage ||
                 getFriendlyHttpErrorMessage(error, "Falha ao criar agente")
@@ -184,6 +193,8 @@ export async function deleteAgent(agentId: number) {
         console.error("Failed to delete agent:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        await redirectOnAuthError(error);
 
         throw new Error(
             apiMessage ||
