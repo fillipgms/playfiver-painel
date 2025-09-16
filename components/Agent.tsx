@@ -108,7 +108,7 @@ const Agent = React.forwardRef<
                 <section className="flex items-center w-full justify-between">
                     <div className="flex items-center gap-2">
                         <p className="text-3xl text-primary font-bold border-r-2 border-primary pr-2">
-                            RPT
+                            RTP
                         </p>
                         <div className="flex flex-col">
                             <p className=" text-sm text-foreground/50">
