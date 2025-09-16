@@ -64,16 +64,33 @@ export async function updatePlayer(params: {
                 },
             }
         );
-
-        return data;
+        // Normalize successful response
+        return {
+            success: true,
+            message:
+                (data && (data.msg || data.message)) ||
+                "Jogador atualizado com sucesso",
+            data,
+        } as const;
     } catch (error) {
         console.error("Failed to update player:", error);
-        const apiMessage = (error as { response?: { data?: { msg?: string } } })
-            ?.response?.data?.msg;
-
-        throw new Error(
-            apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao atualizar jogador")
-        );
+        const err = error as {
+            response?: {
+                status?: number;
+                data?: { msg?: string; message?: string };
+            };
+        };
+        const apiMessage =
+            err?.response?.data?.msg || err?.response?.data?.message;
+        return {
+            success: false,
+            status: err?.response?.status,
+            message:
+                apiMessage ||
+                getFriendlyHttpErrorMessage(
+                    error,
+                    "Falha ao atualizar jogador"
+                ),
+        } as const;
     }
 }

@@ -71,14 +71,25 @@ const cols: ColDef<PlayerProps>[] = [
                 const nextVal = isInfluencer ? 0 : 1;
                 const t = toast.loading("Atualizando tipo...");
                 try {
-                    await updatePlayer({ id, influencer: nextVal, rtp });
-                    toast.success(
-                        nextVal === 1
-                            ? "Jogador marcado como Influencer"
-                            : "Jogador marcado como Padrão",
-                        { id: t }
-                    );
-                    p.node.setDataValue("is_influencer", nextVal);
+                    const result = await updatePlayer({
+                        id,
+                        influencer: nextVal,
+                        rtp,
+                    });
+                    if (result.success) {
+                        toast.success(
+                            nextVal === 1
+                                ? "Jogador marcado como Influencer"
+                                : "Jogador marcado como Padrão",
+                            { id: t }
+                        );
+                        p.node.setDataValue("is_influencer", nextVal);
+                    } else {
+                        toast.error(
+                            result.message || "Erro ao atualizar tipo",
+                            { id: t }
+                        );
+                    }
                 } catch (error: unknown) {
                     const message =
                         error instanceof Error
@@ -170,13 +181,20 @@ const cols: ColDef<PlayerProps>[] = [
 
                 const t = toast.loading("Atualizando RTP...");
                 try {
-                    await updatePlayer({
+                    const result = await updatePlayer({
                         id,
                         rtp: String(numeric),
                         influencer: is_influencer,
                     });
-                    toast.success("RTP atualizado", { id: t });
-                    p.node.setDataValue("rtp", String(numeric));
+                    if (result.success) {
+                        toast.success("RTP atualizado", { id: t });
+                        p.node.setDataValue("rtp", String(numeric));
+                    } else {
+                        toast.error(result.message || "Erro ao atualizar RTP", {
+                            id: t,
+                        });
+                        e.target.value = current;
+                    }
                 } catch (error: unknown) {
                     const message =
                         error instanceof Error
