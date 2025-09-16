@@ -8,6 +8,7 @@ import {
     useCallback,
 } from "react";
 import { getSession, getUser } from "@/actions/user";
+import { useRouter } from "next/navigation";
 
 interface SessionContextType {
     user: User | null;
@@ -29,6 +30,7 @@ export const SessionProvider = ({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
 
     const refreshSession = useCallback(async () => {
         if (!mounted) return;
@@ -50,12 +52,23 @@ export const SessionProvider = ({
             setUser(userData);
             setSession(sessionData);
         } catch (err) {
+            if (
+                err instanceof Error &&
+                err.message.includes("Sessão expirada")
+            ) {
+                setUser(null);
+                setSession(null);
+                setError(null);
+                router.push("/login");
+                return;
+            }
+
             setError("Erro ao carregar sessão");
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, [mounted]);
+    }, [mounted, router]);
 
     useEffect(() => {
         setMounted(true);

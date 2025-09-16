@@ -60,7 +60,7 @@ export async function getUser() {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
-                (await cookies()).delete("session");
+                await clearExpiredSession();
                 throw new Error(
                     "Sessão expirada. Por favor, faça login novamente."
                 );
@@ -81,6 +81,11 @@ export async function getSession() {
     return JSON.parse(cookie) as SessionPayload;
 }
 
+export async function clearExpiredSession() {
+    "use server";
+    (await cookies()).delete("session");
+}
+
 export async function forgotPassword(email: string) {
     try {
         const response = await axios.post(
@@ -91,7 +96,7 @@ export async function forgotPassword(email: string) {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
-                (await cookies()).delete("session");
+                await clearExpiredSession();
                 throw new Error(
                     "Sessão expirada. Por favor, faça login novamente."
                 );
