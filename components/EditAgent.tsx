@@ -53,7 +53,6 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
         url: agent.url,
         currency: agent.currency,
         rtp: agent.rtp,
-        rtp_user: agent.rtp_user,
         bonus_enable: Boolean(agent.bonus_enable),
         limit_enable: Boolean(agent.limit_enable),
         limit_amount: agent.limite_amount,
@@ -100,7 +99,6 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                 agent_code: form.agent_code,
                 password: form.agent_password || "",
                 rtp: form.rtp,
-                rtp_user: form.rtp_user,
                 url: form.url,
                 currency: form.currency,
                 bonus_enable: form.bonus_enable,
@@ -120,10 +118,7 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
         }
     };
 
-    const handlePercentTextChange = (
-        value: string,
-        field: "rtp" | "rtp_user"
-    ) => {
+    const handleRtpTextChange = (value: string) => {
         let sanitized = value.replace(/[^0-9.]/g, "");
         const parts = sanitized.split(".");
         if (parts.length > 2) {
@@ -132,14 +127,13 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
         const numeric = Number(sanitized);
         if (Number.isFinite(numeric)) {
             const clamped = Math.max(1, Math.min(100, numeric));
-            setForm((prev) => ({ ...prev, [field]: String(clamped) }));
+            setForm((prev) => ({ ...prev, rtp: String(clamped) }));
         } else {
-            setForm((prev) => ({ ...prev, [field]: "" }));
+            setForm((prev) => ({ ...prev, rtp: "" }));
         }
     };
 
     const rtpNumber = Number(form.rtp) || 0;
-    const rtpUserNumber = Number(form.rtp_user) || 0;
 
     return (
         <div className="space-y-6">
@@ -324,10 +318,7 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                                         className="w-full h-10 px-3 pr-8 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         value={form.rtp}
                                         onChange={(e) =>
-                                            handlePercentTextChange(
-                                                e.target.value,
-                                                "rtp"
-                                            )
+                                            handleRtpTextChange(e.target.value)
                                         }
                                         disabled={submitting}
                                         placeholder="95.5"
@@ -370,94 +361,29 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label
-                                className="text-sm font-medium text-foreground"
-                                htmlFor="rtp_user"
-                            >
-                                RTP Usuários *
-                            </label>
-                            <div className="space-y-3">
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        id="rtp_user"
-                                        name="rtp_user"
-                                        inputMode="decimal"
-                                        autoComplete="off"
-                                        className="w-full h-10 px-3 pr-8 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        value={form.rtp_user}
-                                        onChange={(e) =>
-                                            handlePercentTextChange(
-                                                e.target.value,
-                                                "rtp_user"
-                                            )
-                                        }
-                                        disabled={submitting}
-                                        placeholder="95.5"
-                                    />
-                                    <PercentIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <input
-                                        type="range"
-                                        min={1}
-                                        max={100}
-                                        step={0.01}
-                                        value={rtpUserNumber}
-                                        onChange={(e) =>
-                                            setForm((prev) => ({
-                                                ...prev,
-                                                rtp_user: String(
-                                                    (
-                                                        e.target as HTMLInputElement
-                                                    ).value
-                                                ),
-                                            }))
-                                        }
-                                        disabled={submitting}
-                                        className="w-full h-2 bg-foreground/10 rounded-lg appearance-none cursor-pointer slider"
-                                    />
-                                    <div className="flex justify-between text-xs text-foreground/60">
-                                        <span>1%</span>
-                                        <span className="font-medium text-primary">
-                                            {rtpUserNumber
-                                                ? rtpUserNumber.toFixed(2)
-                                                : "0.00"}
-                                            %
-                                        </span>
-                                        <span>100%</span>
-                                    </div>
-                                </div>
+                    <div className="flex items-center justify-between p-4 bg-background-secondary/50 rounded-lg border border-foreground/10">
+                        <div className="flex items-center gap-3">
+                            <GameControllerIcon className="w-5 h-5 text-primary" />
+                            <div>
+                                <span className="text-sm font-medium text-foreground">
+                                    Jogos com Bônus
+                                </span>
+                                <p className="text-xs text-foreground/60">
+                                    Habilitar jogos que oferecem bônus
+                                </p>
                             </div>
                         </div>
-
-                        <div className="flex items-center justify-between p-4 bg-background-secondary/50 rounded-lg border border-foreground/10">
-                            <div className="flex items-center gap-3">
-                                <GameControllerIcon className="w-5 h-5 text-primary" />
-                                <div>
-                                    <span className="text-sm font-medium text-foreground">
-                                        Jogos com Bônus
-                                    </span>
-                                    <p className="text-xs text-foreground/60">
-                                        Habilitar jogos que oferecem bônus
-                                    </p>
-                                </div>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name="bonus_enable"
-                                    className="sr-only peer"
-                                    checked={form.bonus_enable}
-                                    onChange={handleChange}
-                                    disabled={submitting}
-                                />
-                                <div className="relative w-11 h-6 bg-foreground/20 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-foreground/20 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                            </label>
-                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="bonus_enable"
+                                className="sr-only peer"
+                                checked={form.bonus_enable}
+                                onChange={handleChange}
+                                disabled={submitting}
+                            />
+                            <div className="relative w-11 h-6 bg-foreground/20 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-foreground/20 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
                     </div>
                 </div>
 
