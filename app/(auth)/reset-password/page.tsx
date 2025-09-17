@@ -3,8 +3,16 @@ import Button from "@/components/Button";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { redirect, useSearchParams } from "next/navigation";
+import { resetPassword } from "@/actions/user";
+import { signIn } from "@/lib/auth";
 
 export default function ResetPasswordPage() {
+    const searchParams = useSearchParams();
+
+    const token = searchParams.get("token");
+    const email = searchParams.get("email");
+
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
@@ -12,61 +20,72 @@ export default function ResetPasswordPage() {
     );
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
-    const resetPassword = () => {
+    const passwordReset = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setError(null);
         setSuccess(null);
         setFieldErrors({});
+        setSubmitting(true);
+
+        const formData = new FormData(e.currentTarget);
+        const password = formData.get("password") as string;
+        const confirmPassword = formData.get("confirmPassword") as string;
+
+        if (!token || !email) {
+            setError("Token ou e-mail inválido");
+            setSubmitting(false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setFieldErrors({
+                confirmPassword: ["As senhas não coincidem"],
+            });
+            setSubmitting(false);
+            return;
+        }
+
+        const result = await resetPassword(
+            email,
+            password,
+            confirmPassword,
+            token
+        );
+
+        if (result.success) {
+            const result = await signIn(formData);
+            if (result.success) {
+                redirect("/");
+            } else {
+                setError(result.message || "Ocorreu um erro ao fazer login");
+                if (result.errors) {
+                    setFieldErrors(result.errors);
+                }
+            }
+        } else {
+            setError(result.message || "Ocorreu um erro ao criar a conta");
+            if (result.errors) {
+                setFieldErrors(result.errors as Record<string, string[]>);
+            }
+        }
+
+        setSubmitting(false);
     };
 
     return (
         <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
             <div className="md:w-1/2 w-full flex justify-center items-center">
-                <form onSubmit={resetPassword} className="space-y-8 w-xs">
+                <form onSubmit={passwordReset} className="space-y-8 w-xs">
                     <div>
-                        <h1 className="font-bold text-xl">Criar Conta</h1>
+                        <h1 className="font-bold text-xl">Alterar Senha</h1>
                         <p className="text-sm text-foreground/70">
-                            Preencha os dados abaixo para criar sua conta
+                            Altera a senha para: {email}
                         </p>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="flex flex-col gap-1">
-                            <label className="capitalize" htmlFor="name">
-                                Nome
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
-                            {fieldErrors.name && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.name[0]}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="capitalize" htmlFor="email">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
-                            {fieldErrors.email && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.email[0]}
-                                </p>
-                            )}
-                        </div>
-
                         <div className="flex flex-col gap-1">
                             <label className="capitalize" htmlFor="password">
                                 Senha
@@ -157,7 +176,17 @@ export default function ResetPasswordPage() {
                         </div>
                     </div>
 
-                    <Button className="w-full">Solicitar Código</Button>
+                    <Button className="w-full">
+                        {" "}
+                        {submitting ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                Alterando...
+                            </div>
+                        ) : (
+                            <div>Alterar senha</div>
+                        )}
+                    </Button>
 
                     <div className="w-full flex items-center gap-2">
                         <span className="w-full block h-0.5 bg-foreground/20" />
