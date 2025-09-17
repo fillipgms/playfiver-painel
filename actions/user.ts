@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function sendCode(email: string) {
     try {
@@ -78,12 +79,35 @@ export async function getSession() {
     if (!cookie) {
         return null;
     }
-    return JSON.parse(cookie) as SessionPayload;
+
+    try {
+        const session = JSON.parse(cookie) as SessionPayload;
+
+        const expires = new Date(session.expires);
+        if (expires < new Date()) {
+            await clearExpiredSession();
+            return null;
+        }
+
+        return session;
+    } catch (error: unknown) {
+        console.error("Failed to get session:", error);
+        await clearExpiredSession();
+        return null;
+    }
 }
 
 export async function clearExpiredSession() {
     "use server";
-    (await cookies()).delete("session");
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
+}
+
+export async function clearSessionAndRedirect() {
+    "use server";
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
+    redirect("/login");
 }
 
 export async function forgotPassword(email: string) {

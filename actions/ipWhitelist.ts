@@ -1,13 +1,15 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
 export async function getIpWhitelist(page: number = 1, search: string = "") {
     const session = await getSession();
+
+    if (!session) {
+        redirect("/login");
+    }
 
     try {
         const { data } = await axios.get(
@@ -18,7 +20,7 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -33,7 +35,13 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -48,6 +56,10 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
 export async function createNewIp(payload: { ip: string }) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.post(
             `https://api.testeplayfiver.com/api/panel/ip`,
@@ -56,7 +68,7 @@ export async function createNewIp(payload: { ip: string }) {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -71,7 +83,13 @@ export async function createNewIp(payload: { ip: string }) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -86,6 +104,10 @@ export async function createNewIp(payload: { ip: string }) {
 export async function deleteIp(id: number) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.delete(
             `https://api.testeplayfiver.com/api/panel/ip/${id}`,
@@ -93,7 +115,7 @@ export async function deleteIp(id: number) {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -108,7 +130,13 @@ export async function deleteIp(id: number) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

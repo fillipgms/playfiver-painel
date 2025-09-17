@@ -1,11 +1,8 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import { deleteSession } from "@/lib/session";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
 const fetchHomeDataCached = unstable_cache(
@@ -30,9 +27,8 @@ const fetchHomeDataCached = unstable_cache(
 export async function getHomeData() {
     const session = await getSession();
 
-    if (!session?.accessToken) {
-        await deleteSession();
-        return { success: false, message: "Sessão ausente ou inválida." };
+    if (!session) {
+        redirect("/login");
     }
 
     try {
@@ -43,7 +39,13 @@ export async function getHomeData() {
         const apiMessage = (err as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

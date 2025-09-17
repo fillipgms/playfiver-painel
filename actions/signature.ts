@@ -1,13 +1,15 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
 export async function getSignatureData() {
     const session = await getSession();
+
+    if (!session) {
+        redirect("/login");
+    }
 
     try {
         const { data } = await axios.get(
@@ -16,7 +18,7 @@ export async function getSignatureData() {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -31,7 +33,13 @@ export async function getSignatureData() {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -52,6 +60,10 @@ export async function createInfluencerOrder(payload: {
 }) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.post(
             "https://api.testeplayfiver.com/api/panel/signature",
@@ -60,7 +72,7 @@ export async function createInfluencerOrder(payload: {
                 timeout: 10000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -88,6 +100,10 @@ export async function createInfluencerOrder(payload: {
 export async function getInfluencerOrderStatus(id: string | number) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.get(
             `https://api.testeplayfiver.com/api/panel/signature?id=${id}`,
@@ -95,7 +111,7 @@ export async function getInfluencerOrderStatus(id: string | number) {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -110,7 +126,13 @@ export async function getInfluencerOrderStatus(id: string | number) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

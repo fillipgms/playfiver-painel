@@ -6,10 +6,11 @@ import {
     ColDef,
     ICellRendererParams,
 } from "ag-grid-community";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { MagnifyingGlassIcon, TrashIcon } from "@phosphor-icons/react";
 import CreateIp from "../CreateIp";
+import { useRouter, useSearchParams } from "next/navigation";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -26,8 +27,50 @@ const IpTable = ({
     whitelist: IpWhitelistProps[];
     onIpCreated?: () => void;
 }) => {
-    const [filter, setFilter] = useState("");
+    const [searchValue, setSearchValue] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
     const gridRef = useRef<AgGridReact<IpWhitelistProps>>(null);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const searchTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+    useEffect(() => {
+        const urlSearch = searchParams?.get("search") || "";
+        setSearchValue(urlSearch);
+    }, [searchParams]);
+
+    const handleSearch = (value: string) => {
+        setSearchValue(value);
+
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            setIsSearching(true);
+            const params = new URLSearchParams(searchParams?.toString() || "");
+
+            if (value.trim()) {
+                params.set("search", value.trim());
+            } else {
+                params.delete("search");
+            }
+
+            params.set("page", "1");
+
+            router.push(`/ipwhitelist?${params.toString()}`);
+
+            setTimeout(() => setIsSearching(false), 100);
+        }, 500);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleDeleteIp = async (id: number) => {
         if (!confirm("Tem certeza que deseja remover este IP da whitelist?")) {
@@ -112,18 +155,16 @@ const IpTable = ({
                         <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2" />
                         <input
                             type="text"
-                            value={filter}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setFilter(value);
-                                gridRef.current?.api.setGridOption(
-                                    "quickFilterText",
-                                    value
-                                );
-                            }}
-                            placeholder="Pesquisa"
+                            value={searchValue}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            placeholder="Pesquisar IPs..."
                             className="border py-1 rounded border-foreground/20 pl-8 w-full sm:w-auto"
                         />
+                        {isSearching && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                            </div>
+                        )}
                     </div>
                     <CreateIp onIpCreated={onIpCreated} />
                 </div>

@@ -1,11 +1,12 @@
 import axios from "axios";
-import { clearExpiredSession } from "@/actions/user";
+import { redirect } from "next/navigation";
 
 export async function redirectOnAuthError(error: unknown) {
     if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 401 || status === 403) {
-            await clearExpiredSession();
+            // Just redirect to login - the middleware will handle invalid sessions
+            redirect("/login");
         }
     }
 }

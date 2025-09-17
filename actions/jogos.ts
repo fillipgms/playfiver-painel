@@ -1,10 +1,8 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
 const fetchGamesCached = unstable_cache(
@@ -31,6 +29,10 @@ export async function getGamesData(
 ): Promise<GamesResponse | null> {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const params = new URLSearchParams();
 
@@ -55,7 +57,13 @@ export async function getGamesData(
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

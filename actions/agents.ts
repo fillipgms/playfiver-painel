@@ -1,10 +1,8 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
 export async function getAgentsData({
     page = 1,
@@ -15,6 +13,10 @@ export async function getAgentsData({
 }) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.get(
             `https://api.testeplayfiver.com/api/panel/agentes?page=${page}&search=${encodeURIComponent(
@@ -24,7 +26,7 @@ export async function getAgentsData({
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -39,7 +41,13 @@ export async function getAgentsData({
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -65,11 +73,11 @@ export type CreateOrUpdateAgentPayload = {
 export async function createAgent(payload: CreateOrUpdateAgentPayload) {
     const session = await getSession();
 
-    try {
-        if (!session) {
-            throw new Error("Unauthorized");
-        }
+    if (!session) {
+        redirect("/login");
+    }
 
+    try {
         const { data } = await axios.post(
             "https://api.testeplayfiver.com/api/panel/agentes",
             {
@@ -85,7 +93,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -104,7 +112,14 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                 error as { response?: { data?: { msg?: string } } }
             )?.response?.data?.msg;
 
-            await redirectOnAuthError(error);
+            // Check if it's an auth error and redirect
+            if (
+                axios.isAxiosError(error) &&
+                (error.response?.status === 401 ||
+                    error.response?.status === 403)
+            ) {
+                redirect("/login");
+            }
 
             throw new Error(
                 apiMessage ||
@@ -120,11 +135,11 @@ export async function updateAgent(
 ) {
     const session = await getSession();
 
-    try {
-        if (!session) {
-            throw new Error("Unauthorized");
-        }
+    if (!session) {
+        redirect("/login");
+    }
 
+    try {
         const { data } = await axios.put(
             `https://api.testeplayfiver.com/api/panel/agentes/`,
             {
@@ -145,7 +160,7 @@ export async function updateAgent(
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -160,7 +175,13 @@ export async function updateAgent(
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -172,18 +193,18 @@ export async function updateAgent(
 export async function deleteAgent(agentId: number) {
     const session = await getSession();
 
-    try {
-        if (!session) {
-            throw new Error("Unauthorized");
-        }
+    if (!session) {
+        redirect("/login");
+    }
 
+    try {
         const { data } = await axios.delete(
             `https://api.testeplayfiver.com/api/panel/agentes/${agentId}`,
             {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -194,7 +215,13 @@ export async function deleteAgent(agentId: number) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

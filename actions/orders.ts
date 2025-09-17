@@ -1,13 +1,15 @@
 "use server";
 import axios from "axios";
+import { redirect } from "next/navigation";
 import { getSession } from "./user";
-import {
-    getFriendlyHttpErrorMessage,
-    redirectOnAuthError,
-} from "@/lib/httpError";
+import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
 export async function getOrdersData() {
     const session = await getSession();
+
+    if (!session) {
+        redirect("/login");
+    }
 
     try {
         const { data } = await axios.get(
@@ -16,7 +18,7 @@ export async function getOrdersData() {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -31,7 +33,13 @@ export async function getOrdersData() {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -51,6 +59,10 @@ export async function createOrder(payload: {
 }) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.post(
             "https://api.testeplayfiver.com/api/panel/order",
@@ -59,7 +71,7 @@ export async function createOrder(payload: {
                 timeout: 10000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -76,7 +88,13 @@ export async function createOrder(payload: {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||
@@ -88,6 +106,10 @@ export async function createOrder(payload: {
 export async function getOrderStatus(id: string | number) {
     const session = await getSession();
 
+    if (!session) {
+        redirect("/login");
+    }
+
     try {
         const { data } = await axios.get(
             `https://api.testeplayfiver.com/api/panel/order?id=${id}`,
@@ -95,7 +117,7 @@ export async function getOrderStatus(id: string | number) {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${session?.accessToken}`,
+                    Authorization: `Bearer ${session.accessToken}`,
                 },
             }
         );
@@ -110,7 +132,13 @@ export async function getOrderStatus(id: string | number) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        await redirectOnAuthError(error);
+        // Check if it's an auth error and redirect
+        if (
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 403)
+        ) {
+            redirect("/login");
+        }
 
         throw new Error(
             apiMessage ||

@@ -1,10 +1,26 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-    const session = request.cookies.get("session")?.value;
+interface SessionPayload {
+    accessToken: string;
+    tokenType: string;
+    expires: string;
+}
 
-    const isLoggedIn = !!session;
+export function middleware(request: NextRequest) {
+    const sessionCookie = request.cookies.get("session")?.value;
+
+    let isLoggedIn = false;
+
+    if (sessionCookie) {
+        try {
+            const session = JSON.parse(sessionCookie) as SessionPayload;
+            const expires = new Date(session.expires);
+            isLoggedIn = expires > new Date();
+        } catch {
+            isLoggedIn = false;
+        }
+    }
 
     const isLoginRoute =
         request.nextUrl.pathname === "/login" ||

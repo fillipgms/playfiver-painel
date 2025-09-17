@@ -107,14 +107,19 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     const fichaValue = useMemo(() => {
         if (amountNumber <= 0) return 0;
 
-        const taxaAplicada = ggrTable.find(
-            (taxa) => amountNumber >= parseFloat(taxa.above)
+        const sorted = [...ggrTable].sort(
+            (a, b) => parseFloat(b.above) - parseFloat(a.above)
         );
         let ggrValue;
-        if (taxaAplicada) {
-            ggrValue = taxaAplicada.tax;
-        } else {
-            ggrValue = 13;
+        for (const level of sorted) {
+            if (amountNumber >= parseFloat(level.above)) {
+                ggrValue = level.tax;
+                break;
+            }
+        }
+
+        if (ggrValue === undefined) {
+            ggrValue = sorted.length ? sorted[sorted.length - 1].tax : 13;
         }
 
         const ggr_decimal = ggrValue / 100;
