@@ -8,6 +8,21 @@ import { resetPassword } from "@/actions/user";
 import { signIn } from "@/lib/auth";
 
 export default function ResetPasswordPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="flex min-h-screen w-full items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <p>Carregando suas informações...</p>
+                </div>
+            }
+        >
+            <ResetPasswordForm />
+        </Suspense>
+    );
+}
+
+function ResetPasswordForm() {
     const searchParams = useSearchParams();
 
     const token = searchParams.get("token");
@@ -75,152 +90,136 @@ export default function ResetPasswordPage() {
     };
 
     return (
-        <Suspense
-            fallback={
-                <div className="flex min-h-screen w-full items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    <p>Caregando suas informações...</p>
-                </div>
-            }
-        >
-            <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
-                <div className="md:w-1/2 w-full flex justify-center items-center">
-                    <form onSubmit={passwordReset} className="space-y-8 w-xs">
-                        <div>
-                            <h1 className="font-bold text-xl">Alterar Senha</h1>
-                            <p className="text-sm text-foreground/70">
-                                Altera a senha para: {email}
-                            </p>
-                        </div>
+        <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
+            <div className="md:w-1/2 w-full flex justify-center items-center">
+                <form onSubmit={passwordReset} className="space-y-8 w-xs">
+                    <div>
+                        <h1 className="font-bold text-xl">Alterar Senha</h1>
+                        <p className="text-sm text-foreground/70">
+                            Altera a senha para: {email}
+                        </p>
+                    </div>
 
-                        <div className="space-y-4">
-                            <div className="flex flex-col gap-1">
-                                <label
-                                    className="capitalize"
-                                    htmlFor="password"
+                    <div className="space-y-4">
+                        <div className="flex flex-col gap-1">
+                            <label className="capitalize" htmlFor="password">
+                                Senha
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    id="password"
+                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    aria-label={
+                                        showPassword
+                                            ? "Ocultar senha"
+                                            : "Mostrar senha"
+                                    }
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
                                 >
-                                    Senha
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={
-                                            showPassword ? "text" : "password"
-                                        }
-                                        name="password"
-                                        id="password"
-                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        aria-label={
-                                            showPassword
-                                                ? "Ocultar senha"
-                                                : "Mostrar senha"
-                                        }
-                                        onClick={() =>
-                                            setShowPassword((v) => !v)
-                                        }
-                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-4 w-4" />
-                                        ) : (
-                                            <Eye className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                                {fieldErrors.password && (
-                                    <p className="text-sm text-[#E53935]">
-                                        {fieldErrors.password[0]}
-                                    </p>
-                                )}
+                                    {showPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
                             </div>
-
-                            <div className="flex flex-col gap-1">
-                                <label
-                                    className="capitalize"
-                                    htmlFor="confirmPassword"
-                                >
-                                    Repetir Senha
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={
-                                            showConfirmPassword
-                                                ? "text"
-                                                : "password"
-                                        }
-                                        name="confirmPassword"
-                                        id="confirmPassword"
-                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        aria-label={
-                                            showConfirmPassword
-                                                ? "Ocultar confirmação"
-                                                : "Mostrar confirmação"
-                                        }
-                                        onClick={() =>
-                                            setShowConfirmPassword((v) => !v)
-                                        }
-                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
-                                    >
-                                        {showConfirmPassword ? (
-                                            <EyeOff className="h-4 w-4" />
-                                        ) : (
-                                            <Eye className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                                {fieldErrors.confirmPassword && (
-                                    <p className="text-sm text-[#E53935]">
-                                        {fieldErrors.confirmPassword[0]}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="text-sm text-[#E53935]">
-                                {error && <p>Erro: {error}</p>}
-                            </div>
-
-                            <div className="text-sm text-green-600">
-                                {success && <p>{success}</p>}
-                            </div>
-                        </div>
-
-                        <Button className="w-full">
-                            {submitting ? (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                    Alterando...
-                                </div>
-                            ) : (
-                                <div>Alterar senha</div>
+                            {fieldErrors.password && (
+                                <p className="text-sm text-[#E53935]">
+                                    {fieldErrors.password[0]}
+                                </p>
                             )}
-                        </Button>
-
-                        <div className="w-full flex items-center gap-2">
-                            <span className="w-full block h-0.5 bg-foreground/20" />
-                            <span className="text-sm">Ou</span>
-                            <span className="w-full block h-0.5 bg-foreground/20" />
                         </div>
 
-                        <div className="flex gap-1 text-sm justify-center">
-                            <p>Já tem uma conta?</p>
-                            <Link
-                                href="/login"
-                                className="underline text-primary flex gap-1 items-center"
+                        <div className="flex flex-col gap-1">
+                            <label
+                                className="capitalize"
+                                htmlFor="confirmPassword"
                             >
-                                Faça login
-                            </Link>
+                                Repetir Senha
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    name="confirmPassword"
+                                    id="confirmPassword"
+                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    aria-label={
+                                        showConfirmPassword
+                                            ? "Ocultar confirmação"
+                                            : "Mostrar confirmação"
+                                    }
+                                    onClick={() =>
+                                        setShowConfirmPassword((v) => !v)
+                                    }
+                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                >
+                                    {showConfirmPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
+                            {fieldErrors.confirmPassword && (
+                                <p className="text-sm text-[#E53935]">
+                                    {fieldErrors.confirmPassword[0]}
+                                </p>
+                            )}
                         </div>
-                    </form>
-                </div>
-                <div className="md:w-1/2 w-full bg-radial from-primary to-[#005EBD] rounded-md overflow-hidden"></div>
-            </main>
-        </Suspense>
+
+                        <div className="text-sm text-[#E53935]">
+                            {error && <p>Erro: {error}</p>}
+                        </div>
+
+                        <div className="text-sm text-green-600">
+                            {success && <p>{success}</p>}
+                        </div>
+                    </div>
+
+                    <Button className="w-full">
+                        {submitting ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                Alterando...
+                            </div>
+                        ) : (
+                            <div>Alterar senha</div>
+                        )}
+                    </Button>
+
+                    <div className="w-full flex items-center gap-2">
+                        <span className="w-full block h-0.5 bg-foreground/20" />
+                        <span className="text-sm">Ou</span>
+                        <span className="w-full block h-0.5 bg-foreground/20" />
+                    </div>
+
+                    <div className="flex gap-1 text-sm justify-center">
+                        <p>Já tem uma conta?</p>
+                        <Link
+                            href="/login"
+                            className="underline text-primary flex gap-1 items-center"
+                        >
+                            Faça login
+                        </Link>
+                    </div>
+                </form>
+            </div>
+            <div className="md:w-1/2 w-full bg-radial from-primary to-[#005EBD] rounded-md overflow-hidden"></div>
+        </main>
     );
 }
