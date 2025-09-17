@@ -13,7 +13,7 @@ export async function getSignatureData() {
 
     try {
         const { data } = await axios.get(
-            "https://api.testeplayfiver.com/api/panel/signature",
+            "https://api.playfivers.com/api/panel/signature",
             {
                 timeout: 5000,
                 headers: {
@@ -75,7 +75,7 @@ export async function createInfluencerOrder(payload: {
 
     try {
         const { data } = await axios.post(
-            "https://api.testeplayfiver.com/api/panel/signature",
+            "https://api.playfivers.com/api/panel/signature",
             processedPayload,
             {
                 timeout: 10000,
@@ -115,7 +115,7 @@ export async function getInfluencerOrderStatus(id: string | number) {
 
     try {
         const { data } = await axios.get(
-            `https://api.testeplayfiver.com/api/panel/signature?id=${id}`,
+            `https://api.playfivers.com/api/panel/signature?id=${id}`,
             {
                 timeout: 5000,
                 headers: {

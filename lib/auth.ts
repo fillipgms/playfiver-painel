@@ -29,7 +29,7 @@ export async function requestVerificationCode(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.testeplayfiver.com/api/auth/code-email-register",
+            url: "https://api.playfivers.com/api/auth/code-email-register",
             data: { name, email },
         });
 
@@ -97,7 +97,7 @@ export async function register(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.testeplayfiver.com/api/auth/register",
+            url: "https://api.playfivers.com/api/auth/register",
             data: { name, email, password, verification_code },
         });
 
@@ -164,7 +164,7 @@ export async function signIn(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.testeplayfiver.com/api/auth/login",
+            url: "https://api.playfivers.com/api/auth/login",
             data: { email, password },
         });
 
@@ -223,7 +223,7 @@ export async function logout(): Promise<{
         }
 
         const response = await axios.post(
-            "https://api.testeplayfiver.com/api/auth/logout",
+            "https://api.playfivers.com/api/auth/logout",
             {},
             {
                 headers: {

@@ -69,7 +69,7 @@ const links = [
             {
                 icon: <FileTextIcon size={24} />,
                 name: "documentação",
-                url: "https://api.testeplayfiver.com/docs/api",
+                url: "https://api.playfivers.com/docs/api",
             },
         ],
     },
