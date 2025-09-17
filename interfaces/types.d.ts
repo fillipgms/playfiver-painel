@@ -172,7 +172,7 @@ interface InfluencerOrderResponse {
     id?: string | number;
     qrcode?: string;
     qrcode64?: string;
-    payment_url?: string;
+    url?: string;
 }
 
 interface TourStep {

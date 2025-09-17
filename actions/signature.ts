@@ -64,10 +64,19 @@ export async function createInfluencerOrder(payload: {
         redirect("/login");
     }
 
+    const processedPayload = {
+        ...payload,
+        cpf:
+            payload.typeMethod === "crypto" &&
+            (!payload.cpf || payload.cpf.trim() === "")
+                ? "00000000000"
+                : payload.cpf,
+    };
+
     try {
         const { data } = await axios.post(
             "https://api.testeplayfiver.com/api/panel/signature",
-            payload,
+            processedPayload,
             {
                 timeout: 10000,
                 headers: {

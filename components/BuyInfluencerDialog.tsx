@@ -118,6 +118,12 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
         return () => clearInterval(interval);
     }, [orderId, notifiedPaid, router]);
 
+    useEffect(() => {
+        if (orderResponse?.url && paymentType === "crypto") {
+            window.open(orderResponse.url, "_blank");
+        }
+    }, [orderResponse?.url, paymentType]);
+
     const handleCopyPix = async () => {
         if (!orderResponse?.qrcode) return;
         try {
@@ -287,17 +293,20 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
                                         </div>
                                     )}
                                 </>
+                            ) : orderResponse?.url ? (
+                                <a
+                                    className="text-sm underline text-primary"
+                                    href={orderResponse.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Abrir link de pagamento
+                                </a>
                             ) : (
-                                orderResponse?.payment_url && (
-                                    <a
-                                        className="text-sm underline text-primary"
-                                        href={orderResponse.payment_url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        Abrir link de pagamento
-                                    </a>
-                                )
+                                <p className="text-xs text-foreground/60">
+                                    Link de pagamento indisponível. Tente
+                                    novamente.
+                                </p>
                             )}
                         </div>
                     )}

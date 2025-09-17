@@ -63,10 +63,19 @@ export async function createOrder(payload: {
         redirect("/login");
     }
 
+    const processedPayload = {
+        ...payload,
+        cpf:
+            payload.type === "crypto" &&
+            (!payload.cpf || payload.cpf.trim() === "")
+                ? "00000000000"
+                : payload.cpf,
+    };
+
     try {
         const { data } = await axios.post(
             "https://api.testeplayfiver.com/api/panel/order",
-            payload,
+            processedPayload,
             {
                 timeout: 10000,
                 headers: {

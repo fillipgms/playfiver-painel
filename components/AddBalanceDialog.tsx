@@ -71,7 +71,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
         id?: string | number | null;
         qrcode?: string | null;
         qrcode64?: string | null;
-        payment_url?: string | null;
+        url?: string | null;
     } | null;
     const [orderResponse, setOrderResponse] = useState<OrderResponse>(null);
     const [orderId, setOrderId] = useState<string>("");
@@ -182,6 +182,13 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
         }, 5000);
         return () => clearInterval(interval);
     }, [orderId, notifiedPaid, router]);
+
+    // Auto-abrir link de pagamento quando disponível
+    useEffect(() => {
+        if (orderResponse?.url && paymentType === "crypto") {
+            window.open(orderResponse.url, "_blank");
+        }
+    }, [orderResponse?.url, paymentType]);
 
     const hasOrder = !!orderResponse;
 
@@ -421,10 +428,10 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                             </p>
                                         )}
                                 </>
-                            ) : orderResponse?.payment_url ? (
+                            ) : orderResponse?.url ? (
                                 <a
                                     className="text-sm underline text-primary"
-                                    href={orderResponse.payment_url}
+                                    href={orderResponse.url}
                                     target="_blank"
                                     rel="noreferrer"
                                 >
