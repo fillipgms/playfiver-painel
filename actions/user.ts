@@ -108,3 +108,34 @@ export async function forgotPassword(email: string) {
         return null;
     }
 }
+
+export async function resetPassword(
+    email: string,
+    password: string,
+    password_confirmation: string,
+    code: string
+) {
+    try {
+        const response = await axios.post(
+            `https://api.playfivers.com/api/auth/reset-password`,
+            {
+                email: email,
+                password: password,
+                password_confirmation: password_confirmation,
+                token: code,
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                await clearExpiredSession();
+                throw new Error(
+                    "Sessão expirada. Por favor, faça login novamente."
+                );
+            }
+        }
+        console.error("Failed to reset password:", error);
+        return null;
+    }
+}

@@ -13,7 +13,7 @@ export async function getWalletsData() {
         const { data } = await axios.get(
             "https://api.playfivers.com/api/panel/wallet",
             {
-                timeout: 5000,
+                timeout: 10000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session?.accessToken}`,
@@ -47,7 +47,7 @@ export async function getWalletGGr(id: number) {
         const { data } = await axios.get(
             `https://api.playfivers.com/api/panel/ggr?type=${id}`,
             {
-                timeout: 5000,
+                timeout: 10000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session?.accessToken}`,
