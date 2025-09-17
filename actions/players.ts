@@ -11,7 +11,7 @@ export async function getPlayersData(page: number = 1, search: string = "") {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/player?page=${page}&search=${encodeURIComponent(
+            `https://api.testeplayfiver.com/api/panel/player?page=${page}&search=${encodeURIComponent(
                 search
             )}`,
             {
@@ -59,7 +59,7 @@ export async function updatePlayer(params: {
             payload.influencer = params.influencer;
 
         const { data } = await axios.put(
-            `https://api.playfivers.com/api/panel/player`,
+            `https://api.testeplayfiver.com/api/panel/player`,
             payload,
             {
                 timeout: 5000,

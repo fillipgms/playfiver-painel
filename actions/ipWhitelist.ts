@@ -11,7 +11,7 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/ip?page=${page}&search=${encodeURIComponent(
+            `https://api.testeplayfiver.com/api/panel/ip?page=${page}&search=${encodeURIComponent(
                 search
             )}`,
             {
@@ -50,7 +50,7 @@ export async function createNewIp(payload: { ip: string }) {
 
     try {
         const { data } = await axios.post(
-            `https://api.playfivers.com/api/panel/ip`,
+            `https://api.testeplayfiver.com/api/panel/ip`,
             payload,
             {
                 timeout: 5000,
@@ -88,7 +88,7 @@ export async function deleteIp(id: number) {
 
     try {
         const { data } = await axios.delete(
-            `https://api.playfivers.com/api/panel/ip/${id}`,
+            `https://api.testeplayfiver.com/api/panel/ip/${id}`,
             {
                 timeout: 5000,
                 headers: {

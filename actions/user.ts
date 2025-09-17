@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 export async function sendCode(email: string) {
     try {
         const response = await axios.get(
-            `https://api.playfivers.com/api/auth/login/code`,
+            `https://api.testeplayfiver.com/api/auth/login/code`,
             { params: { email } }
         );
         return response.data;
@@ -51,7 +51,7 @@ export async function getUser() {
         const session = JSON.parse(cookie) as SessionPayload;
 
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/auth/me`,
+            `https://api.testeplayfiver.com/api/auth/me`,
             {
                 headers: { Authorization: `Bearer ${session.accessToken}` },
             }
@@ -89,7 +89,7 @@ export async function clearExpiredSession() {
 export async function forgotPassword(email: string) {
     try {
         const response = await axios.post(
-            `https://api.playfivers.com/api/auth/forgot-password`,
+            `https://api.testeplayfiver.com/api/auth/forgot-password`,
             { email: email }
         );
         return response.data;
@@ -117,7 +117,7 @@ export async function resetPassword(
 ) {
     try {
         const response = await axios.post(
-            `https://api.playfivers.com/api/auth/reset-password`,
+            `https://api.testeplayfiver.com/api/auth/reset-password`,
             {
                 email: email,
                 password: password,

@@ -14,7 +14,7 @@ export async function getTransactionsData(
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
+            `https://api.testeplayfiver.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
                 search
             )}`,
             {

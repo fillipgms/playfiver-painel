@@ -11,7 +11,7 @@ import { unstable_cache } from "next/cache";
 const fetchHomeDataCached = unstable_cache(
     async (accessToken: string) => {
         const { data } = await axios.get(
-            "https://api.playfivers.com/api/panel/home",
+            "https://api.testeplayfiver.com/api/panel/home",
             {
                 timeout: 5000,
                 headers: {
