@@ -6,6 +6,7 @@ import Button from "./Button";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { ScrollArea } from "./ui/scroll-area";
 
 const Form = ({
     onClose,
@@ -169,7 +170,9 @@ const CreateIp = ({ onIpCreated }: { onIpCreated?: () => void }) => {
             <Drawer open={Boolean(!isDesktop && open)} onOpenChange={setOpen}>
                 <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 max-h-[90vh] overflow-y-auto">
                     <DrawerTitle className="sr-only">Adicionar IP</DrawerTitle>
-                    <Form onClose={handleClose} onIpCreated={onIpCreated} />
+                    <ScrollArea className="p-4 max-h-[60vh] overflow-auto">
+                        <Form onClose={handleClose} onIpCreated={onIpCreated} />
+                    </ScrollArea>
                 </DrawerContent>
             </Drawer>
         </>

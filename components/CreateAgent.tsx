@@ -19,8 +19,9 @@ import {
     SelectTrigger,
 } from "./ui/select";
 import { Dialog, DialogContent } from "./ui/dialog";
-import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { ScrollArea } from "./ui/scroll-area";
 
 const options = [
     { label: "Real Brasileiro (BRL)", value: "BRL" },
@@ -493,12 +494,16 @@ const CreateAgent = ({
             </Dialog>
 
             <Drawer open={Boolean(!isDesktop && open)} onOpenChange={setOpen}>
-                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 max-h-[90vh] overflow-y-auto after:hidden">
+                <DrawerHeader>
                     <DrawerTitle className="sr-only">Criar Agente</DrawerTitle>
-                    <Form
-                        onClose={handleClose}
-                        onAgentCreated={onAgentCreated}
-                    />
+                </DrawerHeader>
+                <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 after:hidden">
+                    <ScrollArea className="p-4 max-h-[60vh] overflow-auto">
+                        <Form
+                            onClose={handleClose}
+                            onAgentCreated={onAgentCreated}
+                        />
+                    </ScrollArea>
                 </DrawerContent>
             </Drawer>
         </>

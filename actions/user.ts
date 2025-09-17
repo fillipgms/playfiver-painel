@@ -90,7 +90,7 @@ export async function forgotPassword(email: string) {
     try {
         const response = await axios.post(
             `https://api.playfivers.com/api/auth/forgot-password`,
-            { email }
+            { email: email }
         );
         return response.data;
     } catch (error) {

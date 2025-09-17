@@ -21,6 +21,7 @@ import {
 import { Dialog, DialogContent } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { ScrollArea } from "./ui/scroll-area";
 
 const options = [
     { label: "Real Brasileiro (BRL)", value: "BRL" },
@@ -640,11 +641,13 @@ const EditAgent = ({ agent, onClose, onSuccess }: EditAgentProps) => {
             <Drawer open={Boolean(!isDesktop)} onOpenChange={onClose}>
                 <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] after:hidden mx-auto p-5 max-h-[90vh] overflow-y-auto">
                     <DrawerTitle className="sr-only">Editar agente</DrawerTitle>
-                    <EditAgentForm
-                        agent={agent}
-                        onClose={onClose}
-                        onSuccess={onSuccess}
-                    />
+                    <ScrollArea className="p-4 max-h-[60vh] overflow-auto">
+                        <EditAgentForm
+                            agent={agent}
+                            onClose={onClose}
+                            onSuccess={onSuccess}
+                        />
+                    </ScrollArea>
                 </DrawerContent>
             </Drawer>
         </>
