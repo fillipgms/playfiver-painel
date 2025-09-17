@@ -305,7 +305,7 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                                 className="text-sm font-medium text-foreground"
                                 htmlFor="rtp"
                             >
-                                RTP Sistema *
+                                RTP (Return to Player) *
                             </label>
                             <div className="space-y-3">
                                 <div className="relative">
