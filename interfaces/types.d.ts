@@ -171,7 +171,7 @@ interface SignatureResponse {
 interface InfluencerOrderResponse {
     id?: string | number;
     qrcode?: string;
-    qrcode_base64?: string;
+    qrcode64?: string;
     payment_url?: string;
 }
 

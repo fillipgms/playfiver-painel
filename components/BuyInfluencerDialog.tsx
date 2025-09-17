@@ -53,6 +53,7 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
     const [orderId, setOrderId] = useState<string>("");
     const [status, setStatus] = useState<Record<string, unknown> | null>(null);
     const [notifiedPaid, setNotifiedPaid] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const influencerPrice = parseFloat(signatureData.prices.inf);
     const totalPrice = influencerPrice * quantity;
@@ -117,12 +118,21 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
         return () => clearInterval(interval);
     }, [orderId, notifiedPaid, router]);
 
+    const handleCopyPix = async () => {
+        if (!orderResponse?.qrcode) return;
+        try {
+            await navigator.clipboard.writeText(orderResponse.qrcode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch {}
+    };
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className={twMerge(triggerClassName)}>Comprar</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl bg-background-primary">
+            <DialogContent className="sm:max-w-xl bg-background-primary max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Comprar Influencers</DialogTitle>
                     <DialogDescription>
@@ -247,11 +257,11 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
                         <div className="space-y-2 border rounded-md p-3 border-foreground/10">
                             {paymentType === "pix" ? (
                                 <>
-                                    {orderResponse?.qrcode_base64 && (
+                                    {orderResponse?.qrcode64 && (
                                         <div className="w-full max-w-[220px] mx-auto rounded overflow-hidden">
                                             <Image
                                                 alt="QR Code Pix"
-                                                src={`data:image/png;base64,${orderResponse.qrcode_base64}`}
+                                                src={`data:image/png;base64,${orderResponse.qrcode64}`}
                                                 width={220}
                                                 height={220}
                                                 className="w-full h-auto"
@@ -260,9 +270,21 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
                                         </div>
                                     )}
                                     {orderResponse?.qrcode && (
-                                        <p className="text-xs break-all bg-foreground/5 p-2 rounded">
-                                            {orderResponse.qrcode}
-                                        </p>
+                                        <div className="space-y-2">
+                                            <p className="text-xs break-all bg-foreground/5 p-2 rounded">
+                                                {orderResponse.qrcode}
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={handleCopyPix}
+                                                    className="text-xs px-2 py-1 rounded border border-foreground/20 hover:bg-foreground/5"
+                                                >
+                                                    {copied
+                                                        ? "Copiado"
+                                                        : "Copiar código Pix"}
+                                                </button>
+                                            </div>
+                                        </div>
                                     )}
                                 </>
                             ) : (
