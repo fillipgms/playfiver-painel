@@ -2,17 +2,15 @@ import { z } from "zod";
 
 export const loginSchema = z.object({
     email: z.string().email("Email inválido"),
-    password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
+    password: z.string(),
 });
 
 export const registerSchema = z
     .object({
         name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
         email: z.string().email("Email inválido"),
-        password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
-        confirmPassword: z
-            .string()
-            .min(8, "Confirmação de senha deve ter pelo menos 8 caracteres"),
+        password: z.string(),
+        confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: "As senhas não coincidem",
