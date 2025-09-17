@@ -337,7 +337,7 @@ const Form = ({
                                             }))
                                         }
                                         disabled={submitting}
-                                        className="w-full h-2 bg-foreground/10 rounded-lg appearance-none cursor-pointer slider"
+                                        className="w-full h-2 bg-foreground/20 dark:bg-foreground/10 rounded-lg appearance-none cursor-pointer slider"
                                     />
                                     <div className="flex justify-between text-xs text-foreground/60">
                                         <span>1%</span>

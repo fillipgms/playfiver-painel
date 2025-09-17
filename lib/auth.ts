@@ -114,6 +114,9 @@ export async function register(formData: FormData) {
             message: "Resposta inesperada do servidor.",
         };
     } catch (error) {
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
+
         if (axios.isAxiosError(error) && error.response?.status === 422) {
             const responseData = error.response.data;
             return {
@@ -135,7 +138,9 @@ export async function register(formData: FormData) {
 
         return {
             success: false,
-            message: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+            message:
+                apiMessage ||
+                "Ocorreu um erro inesperado. Por favor, tente novamente.",
         };
     }
 }
@@ -177,6 +182,8 @@ export async function signIn(formData: FormData) {
             message: "Resposta inesperada do servidor.",
         };
     } catch (error) {
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
         if (axios.isAxiosError(error) && error.response?.status === 422) {
             const responseData = error.response.data;
             return {
@@ -193,7 +200,9 @@ export async function signIn(formData: FormData) {
 
         return {
             success: false,
-            message: "Ocorreu um erro inesperado. Por favor, tente novamente.",
+            message:
+                apiMessage ||
+                "Ocorreu um erro inesperado. Por favor, tente novamente.",
         };
     }
 }
@@ -238,7 +247,8 @@ export async function logout(): Promise<{
         };
     } catch (error) {
         console.error("Error in logout:", error);
-
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
         await deleteSession();
 
         if (axios.isAxiosError(error)) {
@@ -252,7 +262,7 @@ export async function logout(): Promise<{
 
         return {
             success: false,
-            message: "An unexpected error occurred during logout",
+            message: apiMessage || "An unexpected error occurred during logout",
         };
     }
 }

@@ -37,6 +37,7 @@ const Game = ({
         null
     );
     const [isPinned, setIsPinned] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     useEffect(() => {
         const checkPosition = () => {
@@ -89,16 +90,25 @@ const Game = ({
             <div className="transition cursor-pointer group-hover:scale-105">
                 {game.blocked && (
                     <div className="absolute rounded-md top-0 left-0 flex items-center justify-center bg-black/50 h-full w-full">
-                        <LockKeyIcon weight="fill" className="text-4xl" />
+                        <LockKeyIcon weight="fill" className="text-4xl " />
                     </div>
                 )}
-                <Image
-                    src={game.image_url}
-                    alt={game.name}
-                    height={350}
-                    width={300}
-                    className="rounded-md"
-                />
+                {imageError ? (
+                    <div className="rounded-md overflow-hidden w-full aspect-[300/350] bg-background-secondary flex items-center justify-center border-2 border-dashed border-foreground/20">
+                        <div className="text-center text-foreground/50">
+                            <div className="text-sm">Sem imagem</div>
+                        </div>
+                    </div>
+                ) : (
+                    <Image
+                        src={game.image_url}
+                        alt={game.name}
+                        height={350}
+                        width={300}
+                        className="rounded-md w-full h-auto"
+                        onError={() => setImageError(true)}
+                    />
+                )}
             </div>
 
             <div
