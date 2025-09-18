@@ -115,7 +115,7 @@ export async function getInfluencerOrderStatus(id: string | number) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/signature?id=${id}`,
+            `https://api.playfivers.com/api/panel/order?id=${id}`,
             {
                 timeout: 5000,
                 headers: {
@@ -125,15 +125,9 @@ export async function getInfluencerOrderStatus(id: string | number) {
             }
         );
 
-        if (!data) {
-            throw new Error("No valid data received from API");
-        }
-
         return data;
     } catch (error) {
         console.error("Failed to fetch influencer order status:", error);
-        const apiMessage = (error as { response?: { data?: { msg?: string } } })
-            ?.response?.data?.msg;
 
         // Check if it's an auth error and redirect
         if (
@@ -143,12 +137,12 @@ export async function getInfluencerOrderStatus(id: string | number) {
             redirect("/login");
         }
 
-        throw new Error(
-            apiMessage ||
-                getFriendlyHttpErrorMessage(
-                    error,
-                    "Falha ao buscar status do pedido de influencer"
-                )
-        );
+        // HTTP 500 - Pagamento ainda não processado, continua o polling
+        if (axios.isAxiosError(error) && error.response?.status === 500) {
+            return null; // Continua o polling
+        }
+
+        // Outros erros também continuam o polling
+        return null;
     }
 }

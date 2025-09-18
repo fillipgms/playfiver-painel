@@ -68,7 +68,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
     const [copied, setCopied] = useState(false);
 
     type OrderResponse = {
-        id?: string | number | null;
+        idTransaction?: string | number | null;
         qrcode?: string | null;
         qrcode64?: string | null;
         url?: string | null;
@@ -153,7 +153,9 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
             const data = (await createOrder(payload)) as OrderResponse;
             setOrderResponse(data);
 
-            if (data?.id) setOrderId(String(data.id));
+            console.log(data);
+
+            if (data?.idTransaction) setOrderId(String(data.idTransaction));
         } catch (e) {
             console.error(e);
             setApiError("Erro ao criar o pedido. Tente novamente.");
@@ -169,21 +171,23 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                 const data = await getOrderStatus(orderId);
                 setStatus(data);
 
-                if (!notifiedPaid) {
-                    toast.success("Pagamento confirmado!");
+                if (data && !notifiedPaid) {
+                    toast.success("Pagamento concluído!");
                     setNotifiedPaid(true);
-                    router.refresh();
-                    setOpen(false);
-                    setOrderId("");
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        router.refresh();
+                        setOpen(false);
+                        setOrderId("");
+                    }, 1000);
                 }
             } catch (e) {
-                console.error(e);
+                console.error("Erro ao verificar status do pedido:", e);
             }
-        }, 5000);
+        }, 2000);
         return () => clearInterval(interval);
     }, [orderId, notifiedPaid, router]);
 
-    // Auto-abrir link de pagamento quando disponível
     useEffect(() => {
         if (orderResponse?.url && paymentType === "crypto") {
             window.open(orderResponse.url, "_blank");

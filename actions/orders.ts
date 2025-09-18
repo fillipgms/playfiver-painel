@@ -131,30 +131,20 @@ export async function getOrderStatus(id: string | number) {
             }
         );
 
-        if (!data) {
-            throw new Error("No valid data received from API");
-        }
-
         return data;
     } catch (error) {
         console.error("Failed to fetch order status:", error);
-        const apiMessage = (error as { response?: { data?: { msg?: string } } })
-            ?.response?.data?.msg;
 
-        // Check if it's an auth error and redirect
         if (
             axios.isAxiosError(error) &&
             (error.response?.status === 401 || error.response?.status === 403)
         ) {
             redirect("/login");
         }
+        if (axios.isAxiosError(error) && error.response?.status === 500) {
+            return null;
+        }
 
-        throw new Error(
-            apiMessage ||
-                getFriendlyHttpErrorMessage(
-                    error,
-                    "Falha ao buscar status do pedido"
-                )
-        );
+        return null;
     }
 }

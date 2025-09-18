@@ -88,7 +88,10 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
 
             const data = await createInfluencerOrder(payload);
             setOrderResponse(data);
-            if (data?.id) setOrderId(String(data.id));
+
+            console.log(data);
+
+            if (data?.idTransaction) setOrderId(String(data.idTransaction));
         } catch (e) {
             console.error(e);
             alert("Erro ao criar pedido de influencer");
@@ -104,17 +107,20 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
                 const data = await getInfluencerOrderStatus(orderId);
                 setStatus(data);
 
-                if (!notifiedPaid) {
-                    toast.success("Pagamento confirmado!");
+                if (data && !notifiedPaid) {
+                    toast.success("Pagamento concluído!");
                     setNotifiedPaid(true);
-                    router.refresh();
-                    setOpen(false);
-                    setOrderId("");
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        router.refresh();
+                        setOpen(false);
+                        setOrderId("");
+                    }, 1000);
                 }
             } catch (e) {
-                console.error(e);
+                console.error("Erro ao verificar status do pedido:", e);
             }
-        }, 5000);
+        }, 2000);
         return () => clearInterval(interval);
     }, [orderId, notifiedPaid, router]);
 
