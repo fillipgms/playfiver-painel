@@ -141,6 +141,7 @@ interface GamesFilters {
     provedor?: string[];
     typeGame?: string[];
     bonus?: string;
+    carteira?: string[];
 }
 
 interface OrderProps {

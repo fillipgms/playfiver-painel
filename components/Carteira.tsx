@@ -287,9 +287,7 @@ const Carteira = ({
                         )}
                     />
                     <Link
-                        href={`/jogos?provedor=[${carteira.provedores
-                            .map((p) => p.id)
-                            .join(",")}]&page=1`}
+                        href={`/jogos?carteira=[${carteira.id}]&page=1`}
                         className="border text-primary border-primary inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 has-[>svg]:px-3"
                     >
                         Ver Jogos

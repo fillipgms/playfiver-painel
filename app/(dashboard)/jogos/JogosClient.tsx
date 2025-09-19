@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Game from "@/components/Game";
 import {
     MagnifyingGlassIcon,
-    X,
-    FunnelSimple,
-    GameController,
-    SpinnerGap,
-    WarningCircle,
+    XIcon,
+    GameControllerIcon,
+    SpinnerGapIcon,
+    WarningCircleIcon,
+    FunnelSimpleIcon,
 } from "@phosphor-icons/react";
 
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { getGamesData } from "@/actions/jogos";
+import { getWalletsData } from "@/actions/carteiras";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/Card";
@@ -39,12 +40,27 @@ export default function JogosClient({ initialData }: JogosClientProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState<GamesFilters>({});
     const [provedores] = useState(initialData.provedor);
+    const [carteiras, setCarteiras] = useState<WalletProps[]>([]);
     const [showFilters, setShowFilters] = useState(false);
     const [totalGames, setTotalGames] = useState(initialData.total);
 
     const isGameTourStep = useGameTourStep();
 
     const observerRef = useRef<HTMLDivElement>(null);
+
+    // Buscar carteiras ao carregar o componente
+    useEffect(() => {
+        const fetchCarteiras = async () => {
+            try {
+                const carteirasData = await getWalletsData();
+                setCarteiras(carteirasData);
+            } catch (error) {
+                console.error("Error loading carteiras:", error);
+            }
+        };
+
+        fetchCarteiras();
+    }, []);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -134,10 +150,31 @@ export default function JogosClient({ initialData }: JogosClientProps) {
         const parsedFilters: GamesFilters = {
             provedor: parseArray("provedor").map(String),
             typeGame: parseArray("typeGame").map(String),
+            carteira: parseArray("carteira").map(String),
             bonus: params.get("bonus") || undefined,
             search: params.get("search") || undefined,
             page: params.get("page") ? Number(params.get("page")) : 1,
         };
+
+        // Se carteira está na URL, converter para provedores
+        if (parsedFilters.carteira?.length && carteiras.length > 0) {
+            const selectedCarteiras = carteiras.filter((c) =>
+                parsedFilters.carteira?.includes(String(c.id))
+            );
+            const provedoresFromCarteiras = selectedCarteiras.flatMap((c) =>
+                c.provedores.map((p) => String(p.id))
+            );
+
+            // Remover duplicatas e combinar com provedores existentes
+            const uniqueProvedores = [
+                ...new Set([
+                    ...(parsedFilters.provedor || []),
+                    ...provedoresFromCarteiras,
+                ]),
+            ];
+
+            parsedFilters.provedor = uniqueProvedores;
+        }
 
         setFilters(parsedFilters);
         setSearchTerm(parsedFilters.search || "");
@@ -145,13 +182,14 @@ export default function JogosClient({ initialData }: JogosClientProps) {
         const hasFilters =
             parsedFilters.provedor?.length ||
             parsedFilters.typeGame?.length ||
+            parsedFilters.carteira?.length ||
             parsedFilters.bonus ||
             parsedFilters.search;
 
         if (hasFilters) {
             loadGames(parsedFilters, parsedFilters.page || 1);
         }
-    }, [searchParams, loadGames]);
+    }, [searchParams, loadGames, carteiras]);
 
     const createQueryString = useCallback((filters: GamesFilters) => {
         const params = new URLSearchParams();
@@ -165,6 +203,11 @@ export default function JogosClient({ initialData }: JogosClientProps) {
         if (filters.typeGame?.length) {
             params.set("typeGame", `[${filters.typeGame.join(",")}]`);
         }
+
+        if (filters.carteira?.length) {
+            params.set("carteira", `[${filters.carteira.join(",")}]`);
+        }
+
         if (filters.bonus) params.set("bonus", filters.bonus);
 
         if (filters.page) params.set("page", filters.page.toString());
@@ -174,6 +217,19 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
     const handleFilterChange = (newFilters: Partial<GamesFilters>) => {
         const updatedFilters = { ...filters, ...newFilters };
+
+        if (newFilters.carteira !== undefined) {
+            const selectedCarteiras = carteiras.filter((c) =>
+                newFilters.carteira?.includes(String(c.id))
+            );
+            const provedoresFromCarteiras = selectedCarteiras.flatMap((c) =>
+                c.provedores.map((p) => String(p.id))
+            );
+
+            const uniqueProvedores = [...new Set(provedoresFromCarteiras)];
+
+            updatedFilters.provedor = uniqueProvedores;
+        }
 
         setFilters(updatedFilters);
         setCurrentPage(1);
@@ -216,6 +272,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
             searchTerm ||
             filters.provedor?.length ||
             filters.typeGame?.length ||
+            filters.carteira?.length ||
             filters.bonus
         );
     };
@@ -223,6 +280,11 @@ export default function JogosClient({ initialData }: JogosClientProps) {
     const provedorOptions = provedores.map((p) => ({
         label: p.name,
         value: String(p.id),
+    }));
+
+    const carteiraOptions = carteiras.map((c) => ({
+        label: c.name,
+        value: String(c.id),
     }));
 
     return (
@@ -248,7 +310,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
                                     className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
                                     aria-label="Limpar pesquisa"
                                 >
-                                    <X className="h-4 w-4" />
+                                    <XIcon className="h-4 w-4" />
                                 </Button>
                             )}
                         </div>
@@ -260,7 +322,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
                             onClick={() => setShowFilters(!showFilters)}
                             className="flex items-center gap-2"
                         >
-                            <FunnelSimple className="h-4 w-4" />
+                            <FunnelSimpleIcon className="h-4 w-4" />
                             Filtros
                             {hasActiveFilters() && (
                                 <div className="h-2 w-2 rounded-full bg-primary" />
@@ -281,7 +343,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
                 {showFilters && (
                     <Card className="p-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">
                                     Provedores
@@ -297,6 +359,29 @@ export default function JogosClient({ initialData }: JogosClientProps) {
                                     }}
                                     className="w-full"
                                     placeholder="Selecionar provedores"
+                                    animationConfig={{
+                                        badgeAnimation: "none",
+                                        popoverAnimation: "none",
+                                        optionHoverAnimation: "none",
+                                    }}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">
+                                    Carteiras
+                                </label>
+                                <MultiSelect
+                                    options={carteiraOptions}
+                                    defaultValue={filters.carteira || []}
+                                    onValueChange={(values) => {
+                                        handleFilterChange({
+                                            carteira:
+                                                values.length > 0 ? values : [],
+                                        });
+                                    }}
+                                    className="w-full"
+                                    placeholder="Selecionar carteiras"
                                     animationConfig={{
                                         badgeAnimation: "none",
                                         popoverAnimation: "none",
@@ -376,7 +461,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
-                        <GameController className="h-4 w-4" />
+                        <GameControllerIcon className="h-4 w-4" />
                         <span>
                             {loading
                                 ? "Carregando..."
@@ -394,7 +479,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
             {error && (
                 <Card className="p-4 border-destructive/50 bg-destructive/5">
                     <div className="flex items-center gap-2 text-destructive">
-                        <WarningCircle className="h-4 w-4" />
+                        <WarningCircleIcon className="h-4 w-4" />
                         <span className="text-sm">{error}</span>
                     </div>
                 </Card>
@@ -402,7 +487,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
             {loading && (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                    <SpinnerGap className="h-8 w-8 animate-spin text-primary" />
+                    <SpinnerGapIcon className="h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm text-muted-foreground">
                         Carregando jogos...
                     </p>
@@ -413,7 +498,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
                 <>
                     {games.length === 0 ? (
                         <Card className="p-12 text-center">
-                            <GameController className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                            <GameControllerIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                             <h3 className="text-lg font-semibold mb-2">
                                 Nenhum jogo encontrado
                             </h3>
@@ -449,7 +534,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
             {loadingMore && (
                 <div className="flex justify-center py-8">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <SpinnerGap className="h-4 w-4 animate-spin" />
+                        <SpinnerGapIcon className="h-4 w-4 animate-spin" />
                         Carregando mais jogos...
                     </div>
                 </div>

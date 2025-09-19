@@ -57,7 +57,6 @@ export async function getGamesData(
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        // Check if it's an auth error and redirect
         if (
             axios.isAxiosError(error) &&
             (error.response?.status === 401 || error.response?.status === 403)
