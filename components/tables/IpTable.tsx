@@ -166,7 +166,10 @@ const IpTable = ({
                             </div>
                         )}
                     </div>
-                    <CreateIp onIpCreated={onIpCreated} />
+                    <CreateIp
+                        onIpCreated={onIpCreated}
+                        existingIps={whitelist.map((item) => item.ip)}
+                    />
                 </div>
             </div>
             <div className="overflow-x-auto">

@@ -254,6 +254,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             value={amount}
                             onAccept={(val: string) => setAmount(val)}
                             disabled={hasOrder || submitting}
+                            max={10000}
                             className="w-full rounded-md border border-foreground/20 px-3 py-2 outline-hidden focus:ring-2 focus:ring-foreground/30"
                         />
                         <p className="text-xs text-foreground/60">
@@ -272,6 +273,11 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             <p className="text-xs text-[#E53935]">
                                 Valor mínimo para esta carteira é{" "}
                                 {formatCurrencyBRL(minTable)}
+                            </p>
+                        )}
+                        {amountNumber > 10000 && (
+                            <p className="text-xs text-[#E53935]">
+                                Valor máximo permitido é R$ 10.000,00
                             </p>
                         )}
                     </div>
@@ -477,6 +483,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             submitting ||
                             amountNumber <= 0 ||
                             (amountNumber > 0 && amountNumber < minTable) ||
+                            amountNumber > 10000 ||
                             (paymentType === "pix" &&
                                 cpfValue.replace(/\D/g, "").length !== 11)
                         }

@@ -123,6 +123,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
         const parseArray = (key: string): string[] => {
             const raw = params.get(key);
             if (!raw) return [];
+
             try {
                 return JSON.parse(raw);
             } catch {
@@ -140,7 +141,17 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
         setFilters(parsedFilters);
         setSearchTerm(parsedFilters.search || "");
-    }, [searchParams]);
+
+        const hasFilters =
+            parsedFilters.provedor?.length ||
+            parsedFilters.typeGame?.length ||
+            parsedFilters.bonus ||
+            parsedFilters.search;
+
+        if (hasFilters) {
+            loadGames(parsedFilters, parsedFilters.page || 1);
+        }
+    }, [searchParams, loadGames]);
 
     const createQueryString = useCallback((filters: GamesFilters) => {
         const params = new URLSearchParams();

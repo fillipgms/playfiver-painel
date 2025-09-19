@@ -90,6 +90,7 @@ interface WalletProps {
     saldo: string;
     agents: WalletAgentProps[];
     status: number;
+    provedores: { name: string; id: number }[];
 }
 
 interface WalletAgentProps {

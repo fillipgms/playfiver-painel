@@ -94,7 +94,7 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
             setSubmitting(true);
 
             const { updateAgent } = await import("@/actions/agents");
-            await updateAgent(agent.id, {
+            const result = await updateAgent(agent.id, {
                 agent_memo: form.agent_memo,
                 agent_code: form.agent_code,
                 password: form.agent_password || "",
@@ -107,8 +107,12 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                 limit_hours: form.limit_hours,
             });
 
-            onSuccess?.();
-            onClose();
+            if (result.success) {
+                onSuccess?.();
+                onClose();
+            } else {
+                setError(result.error || "Erro ao salvar");
+            }
         } catch (e) {
             console.error(e);
             const message = e instanceof Error ? e.message : "Erro ao salvar";

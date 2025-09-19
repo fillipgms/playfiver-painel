@@ -103,7 +103,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
         if (!data) {
             throw new Error("No valid data received from API");
         }
-        return data;
+        return { success: true, data };
     } catch (error: unknown) {
         if (error) {
             console.error("Failed to create agent:", error);
@@ -121,10 +121,35 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                 redirect("/login");
             }
 
-            throw new Error(
-                apiMessage ||
-                    getFriendlyHttpErrorMessage(error, "Falha ao criar agente")
-            );
+            let errorMessage = "Falha ao criar agente";
+
+            if (apiMessage) {
+                if (
+                    apiMessage.toLowerCase().includes("duplicate") ||
+                    apiMessage.toLowerCase().includes("already exists") ||
+                    apiMessage.toLowerCase().includes("já existe") ||
+                    apiMessage.toLowerCase().includes("agent_code")
+                ) {
+                    errorMessage = "Este código de agente já existe";
+                } else if (
+                    apiMessage.toLowerCase().includes("invalid") ||
+                    apiMessage.toLowerCase().includes("inválido")
+                ) {
+                    errorMessage = "Dados inválidos fornecidos";
+                } else {
+                    errorMessage = apiMessage;
+                }
+            } else {
+                errorMessage = getFriendlyHttpErrorMessage(
+                    error,
+                    "Falha ao criar agente"
+                );
+            }
+
+            return {
+                success: false,
+                error: errorMessage,
+            };
         }
     }
 }
@@ -168,9 +193,9 @@ export async function updateAgent(
         if (!data) {
             throw new Error("No valid data received from API");
         }
-        return data;
+        return { success: true, data };
     } catch (error) {
-        console.error("Failed to create agent:", error);
+        console.error("Failed to update agent:", error);
 
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
@@ -183,10 +208,37 @@ export async function updateAgent(
             redirect("/login");
         }
 
-        throw new Error(
-            apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao criar agente")
-        );
+        // Return error object instead of throwing
+        let errorMessage = "Falha ao atualizar agente";
+
+        if (apiMessage) {
+            // Check for common error patterns and provide user-friendly messages
+            if (
+                apiMessage.toLowerCase().includes("duplicate") ||
+                apiMessage.toLowerCase().includes("already exists") ||
+                apiMessage.toLowerCase().includes("já existe") ||
+                apiMessage.toLowerCase().includes("agent_code")
+            ) {
+                errorMessage = "Este código de agente já existe";
+            } else if (
+                apiMessage.toLowerCase().includes("invalid") ||
+                apiMessage.toLowerCase().includes("inválido")
+            ) {
+                errorMessage = "Dados inválidos fornecidos";
+            } else {
+                errorMessage = apiMessage;
+            }
+        } else {
+            errorMessage = getFriendlyHttpErrorMessage(
+                error,
+                "Falha ao atualizar agente"
+            );
+        }
+
+        return {
+            success: false,
+            error: errorMessage,
+        };
     }
 }
 

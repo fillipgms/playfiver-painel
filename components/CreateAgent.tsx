@@ -91,7 +91,7 @@ const Form = ({
             setSubmitting(true);
 
             const { createAgent } = await import("@/actions/agents");
-            await createAgent({
+            const result = await createAgent({
                 agent_memo: form.agent_memo,
                 agent_code: form.agent_code,
                 password: form.agent_password || "",
@@ -100,8 +100,13 @@ const Form = ({
                 currency: form.currency,
                 bonus_enable: form.bonus_enable,
             });
-            onClose();
-            onAgentCreated?.();
+
+            if (result?.success) {
+                onClose();
+                onAgentCreated?.();
+            } else {
+                setError(result?.error || "Erro ao salvar");
+            }
         } catch (e) {
             console.error(e);
             const message = e instanceof Error ? e.message : "Erro ao salvar";

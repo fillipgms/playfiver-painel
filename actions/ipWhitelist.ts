@@ -77,13 +77,12 @@ export async function createNewIp(payload: { ip: string }) {
             throw new Error("No valid data received from API");
         }
 
-        return data;
+        return { success: true, data };
     } catch (error) {
         console.error("Failed to create new IP on whitelist:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        // Check if it's an auth error and redirect
         if (
             axios.isAxiosError(error) &&
             (error.response?.status === 401 || error.response?.status === 403)
@@ -91,13 +90,34 @@ export async function createNewIp(payload: { ip: string }) {
             redirect("/login");
         }
 
-        throw new Error(
-            apiMessage ||
-                getFriendlyHttpErrorMessage(
-                    error,
-                    "Falha ao criar essa regra de IP"
-                )
-        );
+        let errorMessage = "Falha ao criar essa regra de IP";
+
+        if (apiMessage) {
+            if (
+                apiMessage.toLowerCase().includes("duplicate") ||
+                apiMessage.toLowerCase().includes("already exists") ||
+                apiMessage.toLowerCase().includes("já existe")
+            ) {
+                errorMessage = "Este endereço IP já existe na whitelist";
+            } else if (
+                apiMessage.toLowerCase().includes("invalid") ||
+                apiMessage.toLowerCase().includes("inválido")
+            ) {
+                errorMessage = "Endereço IP inválido";
+            } else {
+                errorMessage = apiMessage;
+            }
+        } else {
+            errorMessage = getFriendlyHttpErrorMessage(
+                error,
+                "Falha ao criar essa regra de IP"
+            );
+        }
+
+        return {
+            success: false,
+            error: errorMessage,
+        };
     }
 }
 

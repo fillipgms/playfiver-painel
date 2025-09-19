@@ -11,9 +11,11 @@ import { ScrollArea } from "./ui/scroll-area";
 const Form = ({
     onClose,
     onIpCreated,
+    existingIps = [],
 }: {
     onClose: () => void;
     onIpCreated?: () => void;
+    existingIps?: string[];
 }) => {
     const [error, setError] = useState("");
     const [ip, setIp] = useState("");
@@ -39,6 +41,10 @@ const Form = ({
             setError("Por favor, digite um endereço IP válido");
             return;
         }
+        if (existingIps.includes(ip.trim())) {
+            setError("Este endereço IP já existe na whitelist");
+            return;
+        }
 
         setError("");
 
@@ -46,9 +52,14 @@ const Form = ({
             setSubmitting(true);
 
             const { createNewIp } = await import("@/actions/ipWhitelist");
-            await createNewIp({ ip: ip.trim() });
-            onClose();
-            onIpCreated?.();
+            const result = await createNewIp({ ip: ip.trim() });
+
+            if (result.success) {
+                onClose();
+                onIpCreated?.();
+            } else {
+                setError(result.error || "Erro ao adicionar IP");
+            }
         } catch (e) {
             console.error(e);
             const message =
@@ -144,7 +155,13 @@ const Form = ({
     );
 };
 
-const CreateIp = ({ onIpCreated }: { onIpCreated?: () => void }) => {
+const CreateIp = ({
+    onIpCreated,
+    existingIps = [],
+}: {
+    onIpCreated?: () => void;
+    existingIps?: string[];
+}) => {
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const [open, setOpen] = useState(false);
 
@@ -167,7 +184,11 @@ const CreateIp = ({ onIpCreated }: { onIpCreated?: () => void }) => {
             <Dialog open={Boolean(isDesktop && open)} onOpenChange={setOpen}>
                 <DialogContent className="bg-background-primary max-h-[85vh] overflow-y-auto max-w-md">
                     <DialogTitle className="sr-only">Adicionar IP</DialogTitle>
-                    <Form onClose={handleClose} onIpCreated={onIpCreated} />
+                    <Form
+                        onClose={handleClose}
+                        onIpCreated={onIpCreated}
+                        existingIps={existingIps}
+                    />
                 </DialogContent>
             </Dialog>
 
@@ -175,7 +196,11 @@ const CreateIp = ({ onIpCreated }: { onIpCreated?: () => void }) => {
                 <DrawerContent className="bg-background-primary max-w-[calc(100vw_-_2rem)] mx-auto p-5 max-h-[90vh] overflow-y-auto">
                     <DrawerTitle className="sr-only">Adicionar IP</DrawerTitle>
                     <ScrollArea className="p-4 max-h-[60vh] overflow-auto">
-                        <Form onClose={handleClose} onIpCreated={onIpCreated} />
+                        <Form
+                            onClose={handleClose}
+                            onIpCreated={onIpCreated}
+                            existingIps={existingIps}
+                        />
                     </ScrollArea>
                 </DrawerContent>
             </Drawer>

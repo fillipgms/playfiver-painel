@@ -66,7 +66,7 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-foreground/70">
-                        Agentes Ativos
+                        Histórico de consumo
                     </span>
                     <span className="bg-foreground/10 text-foreground/60 text-xs px-2 py-0.5 rounded-full">
                         {safeAgents.length}
@@ -142,7 +142,7 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
                 {safeAgents.length === 0 && (
                     <div className="bg-foreground/5 rounded-lg p-3 border border-foreground/10 min-h-[76px] flex items-center justify-center">
                         <span className="text-foreground/50 text-sm">
-                            Nenhum agente ativo
+                            Sem consumo hoje
                         </span>
                     </div>
                 )}
