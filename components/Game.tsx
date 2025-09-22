@@ -1,8 +1,10 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { LockKeyIcon, SealCheckIcon } from "@phosphor-icons/react";
+import { LockKeyIcon, SealCheckIcon, CopySimple } from "@phosphor-icons/react";
 import { twMerge } from "tailwind-merge";
+import Button from "./Button";
+import { toast } from "sonner";
 
 const Badge = ({
     active,
@@ -38,6 +40,20 @@ const Game = ({
     );
     const [isPinned, setIsPinned] = useState(false);
     const [imageError, setImageError] = useState(false);
+    const handleCopy = async (
+        e: React.MouseEvent,
+        value: string,
+        label: string
+    ) => {
+        e.stopPropagation();
+        try {
+            await navigator.clipboard.writeText(value);
+            toast.success(`${label} copiado!`);
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error(`Falha ao copiar ${label.toLowerCase()}.`);
+        }
+    };
 
     useEffect(() => {
         const checkPosition = () => {
@@ -154,6 +170,27 @@ const Game = ({
                     <Badge active={game.rodadasfree === 1}>
                         Rodadas Grátis
                     </Badge>
+                </div>
+
+                <div className="flex flex-col gap-2 pt-1">
+                    <Button
+                        variant="secondary"
+                        className="text-xs px-2 py-1 h-auto"
+                        onClick={(e) =>
+                            handleCopy(e, String(game.id), "ID do jogo")
+                        }
+                    >
+                        <CopySimple /> Copiar ID
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        className="text-xs px-2 py-1 h-auto"
+                        onClick={(e) =>
+                            handleCopy(e, game.image_url, "Link da imagem")
+                        }
+                    >
+                        <CopySimple /> Copiar imagem
+                    </Button>
                 </div>
             </div>
         </div>
