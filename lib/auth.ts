@@ -7,7 +7,7 @@ import {
     verifyCodeSchema,
 } from "@/schemas";
 import axios from "axios";
-import { createSession, clearSession } from "./session";
+import { createSession, deleteSession } from "./session";
 import { getSession } from "@/actions/user";
 
 export async function requestVerificationCode(formData: FormData) {
@@ -215,7 +215,7 @@ export async function logout(): Promise<{
         const session = await getSession();
 
         if (!session?.accessToken) {
-            await clearSession();
+            await deleteSession();
             return {
                 success: true,
                 message: "No active session found. Cleared local session.",
@@ -234,7 +234,7 @@ export async function logout(): Promise<{
         );
 
         if (response.status === 200) {
-            await clearSession();
+            await deleteSession();
             return {
                 success: true,
                 message: "Logout successful",
@@ -249,7 +249,7 @@ export async function logout(): Promise<{
         console.error("Error in logout:", error);
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
-                await clearSession();
+                await deleteSession();
                 return {
                     success: true,
                     message: "Session expired. Cleared local session.",
