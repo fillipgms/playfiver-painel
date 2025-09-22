@@ -177,7 +177,7 @@ const Game = ({
                         variant="secondary"
                         className="text-xs px-2 py-1 h-auto"
                         onClick={(e) =>
-                            handleCopy(e, String(game.id), "ID do jogo")
+                            handleCopy(e, String(game.game_code), "ID do jogo")
                         }
                     >
                         <CopySimple /> Copiar ID
