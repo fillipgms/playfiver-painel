@@ -7,7 +7,7 @@ import {
     verifyCodeSchema,
 } from "@/schemas";
 import axios from "axios";
-import { createSession, deleteSession } from "./session";
+import { createSession, clearSession } from "./session";
 import { getSession } from "@/actions/user";
 
 export async function requestVerificationCode(formData: FormData) {
@@ -215,7 +215,7 @@ export async function logout(): Promise<{
         const session = await getSession();
 
         if (!session?.accessToken) {
-            await deleteSession();
+            await clearSession();
             return {
                 success: true,
                 message: "No active session found. Cleared local session.",
@@ -234,7 +234,7 @@ export async function logout(): Promise<{
         );
 
         if (response.status === 200) {
-            await deleteSession();
+            await clearSession();
             return {
                 success: true,
                 message: "Logout successful",
@@ -247,11 +247,15 @@ export async function logout(): Promise<{
         };
     } catch (error) {
         console.error("Error in logout:", error);
-        const apiMessage = (error as { response?: { data?: { msg?: string } } })
-            ?.response?.data?.msg;
-        await deleteSession();
-
         if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                await clearSession();
+                return {
+                    success: true,
+                    message: "Session expired. Cleared local session.",
+                };
+            }
+
             return {
                 success: false,
                 message:
@@ -260,6 +264,8 @@ export async function logout(): Promise<{
             };
         }
 
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
         return {
             success: false,
             message: apiMessage || "An unexpected error occurred during logout",

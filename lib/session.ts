@@ -63,3 +63,8 @@ export async function deleteSession() {
     cookieStore.delete("session");
     redirect("/login");
 }
+
+export async function clearSession() {
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
+}
