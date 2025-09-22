@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import { useSession } from "@/contexts/SessionContext";
 import { signIn } from "@/lib/auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -14,6 +14,7 @@ export default function LoginPage() {
     );
     const [showPassword, setShowPassword] = useState(false);
     const { refreshSession } = useSession();
+    const router = useRouter();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -23,7 +24,7 @@ export default function LoginPage() {
         const result = await signIn(formData);
         if (result.success) {
             refreshSession();
-            redirect("/");
+            router.push("/");
         } else {
             setError(result.message || "Ocorreu um erro ao fazer login");
             if (result.errors) {

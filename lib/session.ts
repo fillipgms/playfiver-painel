@@ -13,7 +13,7 @@ const cookie = {
     name: "session",
     options: {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV !== "development",
         sameSite: "lax" as const,
         path: "/",
     },

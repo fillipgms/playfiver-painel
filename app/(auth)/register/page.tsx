@@ -7,11 +7,12 @@ import {
 } from "@/components/ui/input-otp";
 import { requestVerificationCode, register, signIn } from "@/lib/auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
+    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
@@ -72,7 +73,7 @@ export default function RegisterPage() {
         if (result.success) {
             const result = await signIn(formDataObj);
             if (result.success) {
-                redirect("/");
+                router.push("/");
             } else {
                 setError(result.message || "Ocorreu um erro ao fazer login");
                 if (result.errors) {
