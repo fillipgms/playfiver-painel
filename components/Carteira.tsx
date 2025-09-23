@@ -158,8 +158,6 @@ const Carteira = ({
 
     const isDisabled = carteira.status !== 1;
 
-    console.log(carteira);
-
     return (
         <Card className={isDisabled ? "opacity-50 cursor-not-allowed" : ""}>
             <CardHeader>

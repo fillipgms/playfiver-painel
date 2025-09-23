@@ -10,6 +10,9 @@ interface PaginationControlsProps {
     hasPrevPage: boolean;
     baseUrl: string;
     searchParams: Record<string, string | string[] | undefined>;
+    paramKey?: string;
+    compact?: boolean;
+    hideWhenSinglePage?: boolean;
 }
 
 export default function PaginationControls({
@@ -18,13 +21,16 @@ export default function PaginationControls({
     hasNextPage,
     hasPrevPage,
     baseUrl,
+    paramKey = "page",
+    compact = false,
+    hideWhenSinglePage = true,
 }: PaginationControlsProps) {
     const router = useRouter();
     const searchParamsHook = useSearchParams();
 
     const updatePage = (newPage: number) => {
         const params = new URLSearchParams(searchParamsHook.toString());
-        params.set("page", newPage.toString());
+        params.set(paramKey, newPage.toString());
         router.push(`${baseUrl}?${params.toString()}`);
     };
 
@@ -46,8 +52,38 @@ export default function PaginationControls({
         }
     };
 
-    if (lastPage <= 1) {
+    if (hideWhenSinglePage && lastPage <= 1) {
         return null;
+    }
+
+    if (compact) {
+        return (
+            <div className="flex items-center justify-center gap-2 mt-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousPage}
+                    disabled={!hasPrevPage}
+                    className="p-2 h-8 w-8 min-w-0 cursor-pointer"
+                >
+                    <CaretLeftIcon size={16} />
+                </Button>
+
+                <span className="text-sm text-foreground/70">
+                    {currentPage} / {lastPage}
+                </span>
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextPage}
+                    disabled={!hasNextPage}
+                    className="p-2 h-8 w-8 min-w-0 cursor-pointer"
+                >
+                    <CaretRightIcon size={16} />
+                </Button>
+            </div>
+        );
     }
 
     const getVisiblePages = () => {
@@ -117,8 +153,8 @@ export default function PaginationControls({
                             onClick={() => goToPage(pageNumber)}
                             className={`min-w-[40px] ${
                                 isCurrentPage
-                                    ? "bg-primary text-primary-foreground cursor-pointer"
-                                    : ""
+                                    ? "bg-primary text-primary-foreground"
+                                    : "cursor-pointer"
                             }`}
                         >
                             {pageNumber}

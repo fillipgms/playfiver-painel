@@ -17,43 +17,34 @@ export const metadata: Metadata = {
 };
 
 interface PacotesPageProps {
-    searchParams: Promise<{ page?: string }>;
+    searchParams: Promise<{ page?: string; orders_page?: string }>;
 }
 
 export default async function pacotesPage({ searchParams }: PacotesPageProps) {
     const params = await searchParams;
     const currentPage = parseInt(params.page || "1", 10);
-    const limit = 6;
+    const ordersPage = parseInt(params.orders_page || "1", 10);
 
     try {
-        const [carteiras, pedidos, signatureData] = await Promise.all([
-            getWalletsData() as Promise<WalletProps[]>,
-            getOrdersData(),
+        const [carteirasData, pedidos, signatureData] = await Promise.all([
+            getWalletsData(currentPage) as Promise<WalletResponseProps>,
+            getOrdersData(ordersPage),
             getSignatureData() as Promise<SignatureResponse>,
         ]);
 
-        const totalItems = carteiras.length;
-        const totalPages = Math.ceil(totalItems / limit);
-        const startIndex = (currentPage - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedCarteiras = carteiras.slice(startIndex, endIndex);
-
-        const meta = {
-            current_page: currentPage,
-            last_page: totalPages,
-            per_page: limit,
-            total: totalItems,
-        };
+        const carteiras = carteirasData.data;
 
         return (
             <main className="space-y-8">
                 <section className="space-y-4">
                     <h2 className="text-2xl font-bold ">Pacotes</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-2 sm:px-4 lg:px-0">
-                        {paginatedCarteiras.map((carteira, i) => (
-                            <div key={startIndex + i} id={`carteira-${i}`}>
+                        {carteiras.map((carteira, i) => (
+                            <div key={carteira.id} id={`carteira-${i}`}>
                                 <Carteira
-                                    index={startIndex + i + 1}
+                                    index={
+                                        (carteirasData.from || 1) - 1 + i + 1
+                                    }
                                     carteira={carteira}
                                 />
                             </div>
@@ -61,10 +52,10 @@ export default async function pacotesPage({ searchParams }: PacotesPageProps) {
                     </div>
 
                     <PaginationControls
-                        currentPage={meta.current_page}
-                        lastPage={meta.last_page}
-                        hasNextPage={meta.current_page < meta.last_page}
-                        hasPrevPage={meta.current_page > 1}
+                        currentPage={carteirasData.current_page}
+                        lastPage={carteirasData.last_page}
+                        hasNextPage={!!carteirasData.next_page_url}
+                        hasPrevPage={!!carteirasData.prev_page_url}
                         baseUrl="/pacotes"
                         searchParams={params}
                     />
@@ -121,6 +112,18 @@ export default async function pacotesPage({ searchParams }: PacotesPageProps) {
                                         <Order key={order.id} order={order} />
                                     ))}
                                 </CardContent>
+
+                                <PaginationControls
+                                    currentPage={pedidos.current_page}
+                                    lastPage={pedidos.last_page}
+                                    hasNextPage={!!pedidos.next_page_url}
+                                    hasPrevPage={!!pedidos.prev_page_url}
+                                    baseUrl="/pacotes"
+                                    searchParams={params}
+                                    paramKey="orders_page"
+                                    compact
+                                    hideWhenSinglePage={false}
+                                />
                             </Card>
                         </section>
                     </div>

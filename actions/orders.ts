@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
-export async function getOrdersData() {
+export async function getOrdersData(page: number = 1) {
     const session = await getSession();
 
     if (!session) {
@@ -13,7 +13,7 @@ export async function getOrdersData() {
 
     try {
         const { data } = await axios.get(
-            "https://api.playfivers.com/api/panel/orders?page=1",
+            `https://api.testeplayfiver.com/api/panel/orders?page=${page}`,
             {
                 timeout: 5000,
                 headers: {
@@ -74,7 +74,7 @@ export async function createOrder(payload: {
 
     try {
         const { data } = await axios.post(
-            "https://api.playfivers.com/api/panel/order",
+            "https://api.testeplayfiver.com/api/panel/order",
             processedPayload,
             {
                 timeout: 10000,
@@ -121,7 +121,7 @@ export async function getOrderStatus(id: string | number) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/order?id=${id}`,
+            `https://api.testeplayfiver.com/api/panel/order?id=${id}`,
             {
                 timeout: 5000,
                 headers: {

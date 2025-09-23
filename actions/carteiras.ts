@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
-export async function getWalletsData() {
+export async function getWalletsData(page: number = 1) {
     const session = await getSession();
 
     if (!session) {
@@ -13,7 +13,7 @@ export async function getWalletsData() {
 
     try {
         const { data } = await axios.get(
-            "https://api.playfivers.com/api/panel/wallet",
+            `https://api.testeplayfiver.com/api/panel/wallet?page=${page}`,
             {
                 timeout: 10000,
                 headers: {
@@ -33,7 +33,6 @@ export async function getWalletsData() {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
-        // Check if it's an auth error and redirect
         if (
             axios.isAxiosError(error) &&
             (error.response?.status === 401 || error.response?.status === 403)
@@ -57,7 +56,7 @@ export async function getWalletGGr(id: number) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/ggr?type=${id}`,
+            `https://api.testeplayfiver.com/api/panel/ggr?type=${id}`,
             {
                 timeout: 10000,
                 headers: {
