@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 
 interface PaginationControlsProps {
@@ -41,45 +40,35 @@ export default function PaginationControls({
     if (compact) {
         return (
             <div className="flex items-center justify-center gap-2 mt-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasPrevPage}
-                    className="p-2 h-8 w-8 min-w-0 cursor-pointer"
+                <Link
+                    scroll={false}
+                    href={buildHref(currentPage - 1)}
+                    aria-disabled={!hasPrevPage}
+                    tabIndex={hasPrevPage ? 0 : -1}
+                    onClick={(e) => {
+                        if (!hasPrevPage) e.preventDefault();
+                    }}
+                    className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 p-2 h-8 w-8 min-w-0 cursor-pointer"
                 >
-                    <Link
-                        href={buildHref(currentPage - 1)}
-                        aria-disabled={!hasPrevPage}
-                        tabIndex={hasPrevPage ? 0 : -1}
-                        onClick={(e) => {
-                            if (!hasPrevPage) e.preventDefault();
-                        }}
-                    >
-                        <CaretLeftIcon size={16} />
-                    </Link>
-                </Button>
+                    <CaretLeftIcon size={16} />
+                </Link>
 
                 <span className="text-sm text-foreground/70">
                     {currentPage} / {lastPage}
                 </span>
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNextPage}
-                    className="p-2 h-8 w-8 min-w-0 cursor-pointer"
+                <Link
+                    scroll={false}
+                    href={buildHref(currentPage + 1)}
+                    aria-disabled={!hasNextPage}
+                    tabIndex={hasNextPage ? 0 : -1}
+                    onClick={(e) => {
+                        if (!hasNextPage) e.preventDefault();
+                    }}
+                    className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 p-2 h-8 w-8 min-w-0 cursor-pointer"
                 >
-                    <Link
-                        href={buildHref(currentPage + 1)}
-                        aria-disabled={!hasNextPage}
-                        tabIndex={hasNextPage ? 0 : -1}
-                        onClick={(e) => {
-                            if (!hasNextPage) e.preventDefault();
-                        }}
-                    >
-                        <CaretRightIcon size={16} />
-                    </Link>
-                </Button>
+                    <CaretRightIcon size={16} />
+                </Link>
             </div>
         );
     }
@@ -116,25 +105,19 @@ export default function PaginationControls({
 
     return (
         <div className="flex items-center justify-center gap-2 mt-6">
-            <Button
-                variant="outline"
-                size="sm"
-                disabled={!hasPrevPage}
-                className="flex items-center gap-1 cursor-pointer"
+            <Link
+                scroll={false}
+                href={buildHref(currentPage - 1)}
+                aria-disabled={!hasPrevPage}
+                tabIndex={hasPrevPage ? 0 : -1}
+                className="justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md px-3 has-[>svg]:px-2.5 flex items-center gap-1 cursor-pointer aria-disabled:cursor-not-allowed"
+                onClick={(e) => {
+                    if (!hasPrevPage) e.preventDefault();
+                }}
             >
-                <Link
-                    href={buildHref(currentPage - 1)}
-                    aria-disabled={!hasPrevPage}
-                    tabIndex={hasPrevPage ? 0 : -1}
-                    className="flex items-center gap-1"
-                    onClick={(e) => {
-                        if (!hasPrevPage) e.preventDefault();
-                    }}
-                >
-                    <CaretLeftIcon size={16} />
-                    Anterior
-                </Link>
-            </Button>
+                <CaretLeftIcon size={16} />
+                Anterior
+            </Link>
 
             <div className="flex items-center gap-1">
                 {getVisiblePages().map((page, index) => {
@@ -153,54 +136,41 @@ export default function PaginationControls({
                     const isCurrentPage = pageNumber === currentPage;
 
                     return (
-                        <Button
-                            asChild
+                        <Link
+                            scroll={false}
                             key={pageNumber}
-                            variant={isCurrentPage ? "default" : "outline"}
-                            size="sm"
+                            href={buildHref(pageNumber)}
+                            aria-current={isCurrentPage ? "page" : undefined}
+                            aria-disabled={isCurrentPage}
+                            tabIndex={isCurrentPage ? -1 : 0}
+                            onClick={(e) => {
+                                if (isCurrentPage) e.preventDefault();
+                            }}
                             className={`min-w-[40px] ${
                                 isCurrentPage
-                                    ? "bg-primary text-primary-foreground"
-                                    : "cursor-pointer"
+                                    ? "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs hover:bg-primary/90 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 min-w-[40px] bg-primary text-primary-foreground"
+                                    : "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 min-w-[40px] cursor-pointer"
                             }`}
                         >
-                            <Link
-                                href={buildHref(pageNumber)}
-                                aria-current={
-                                    isCurrentPage ? "page" : undefined
-                                }
-                                aria-disabled={isCurrentPage}
-                                tabIndex={isCurrentPage ? -1 : 0}
-                                onClick={(e) => {
-                                    if (isCurrentPage) e.preventDefault();
-                                }}
-                            >
-                                {pageNumber}
-                            </Link>
-                        </Button>
+                            {pageNumber}
+                        </Link>
                     );
                 })}
             </div>
 
-            <Button
-                variant="outline"
-                size="sm"
-                disabled={!hasNextPage}
-                className="flex items-center gap-1 cursor-pointer"
+            <Link
+                scroll={false}
+                href={buildHref(currentPage + 1)}
+                aria-disabled={!hasNextPage}
+                tabIndex={hasNextPage ? 0 : -1}
+                onClick={(e) => {
+                    if (!hasNextPage) e.preventDefault();
+                }}
+                className="justify-center whitespace-nowrap text-sm font-medium transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md px-3 has-[>svg]:px-2.5 flex items-center gap-1 cursor-pointer aria-disabled:cursor-not-allowed"
             >
-                <Link
-                    href={buildHref(currentPage + 1)}
-                    aria-disabled={!hasNextPage}
-                    tabIndex={hasNextPage ? 0 : -1}
-                    className="flex items-center gap-1"
-                    onClick={(e) => {
-                        if (!hasNextPage) e.preventDefault();
-                    }}
-                >
-                    Próxima
-                    <CaretRightIcon size={16} />
-                </Link>
-            </Button>
+                Próxima
+                <CaretRightIcon size={16} />
+            </Link>
         </div>
     );
 }

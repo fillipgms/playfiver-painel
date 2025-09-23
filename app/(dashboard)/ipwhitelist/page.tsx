@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-    title: "Playfiver - IP Whitelist",
+    title: "IP Whitelist",
     description: "IP Whitelist do sistema",
 };
 

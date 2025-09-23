@@ -24,29 +24,63 @@ export const metadata: Metadata = {
         default: "Playfiver",
         template: "%s | Playfiver",
     },
-    description: "Dashboard do sistema",
+    description:
+        "Dashboard do sistema Playfiver - gerencie tudo em um só lugar.",
     applicationName: "Playfiver",
-    keywords: ["Playfiver", "dashboard", "painel"],
-    icons: {
-        icon: "/favicon.ico",
+    keywords: [
+        "Playfiver",
+        "dashboard",
+        "painel",
+        "gestão",
+        "administração",
+        "sistema",
+    ],
+    authors: [{ name: "Playfiver Team", url: "https://playfiver.app/" }],
+    creator: "Playfiver",
+    publisher: "Playfiver",
+    metadataBase: new URL("https://playfiver.app/"),
+    alternates: {
+        canonical: "/",
+        languages: {
+            "pt-BR": "/pt-BR",
+        },
     },
     openGraph: {
         title: "Playfiver",
-        description: "Dashboard do sistema",
+        description:
+            "Dashboard do sistema Playfiver - gerencie tudo em um só lugar.",
         type: "website",
         locale: "pt_BR",
-        url: "https://playfiver.com.br",
+        url: "https://playfiver.app/",
+        siteName: "Playfiver",
         images: [
             {
                 url: "/logo.png",
                 width: 512,
                 height: 512,
-                alt: "Playfiver",
+                alt: "Playfiver logo",
             },
         ],
     },
-    alternates: {
-        canonical: "/",
+    icons: {
+        icon: "/favicon.ico",
+        shortcut: "/favicon.ico",
+        apple: "/apple-touch-icon.png",
+    },
+    manifest: "/site.webmanifest",
+
+    category: "technology",
+    robots: {
+        index: true,
+        follow: true,
+        nocache: false,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
     },
 };
 
@@ -54,7 +88,7 @@ export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 5,
-    themeColor: "#0b0b0b",
+    themeColor: "#009dd5",
 };
 
 export default function RootLayout({

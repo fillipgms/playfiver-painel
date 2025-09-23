@@ -3,7 +3,7 @@ import JogosClient from "./JogosClient";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Playfiver - Jogos",
+    title: "Jogos",
     description: "Jogos do sistema",
 };
 

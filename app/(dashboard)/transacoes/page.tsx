@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-    title: "Playfiver - Transações",
+    title: "Transações",
     description: "Transações do sistema",
 };
 

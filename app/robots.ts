@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
                 disallow: ["/_next/", "/api/"],
             },
         ],
-        sitemap: "https://playfiver.com.br/sitemap.xml",
+        sitemap: "https://playfiver.app/sitemap.xml",
     };
 }

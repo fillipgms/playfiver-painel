@@ -12,16 +12,16 @@ import PaginationControls from "@/components/PaginationControls";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-    title: "Playfiver - Pacotes",
+    title: "Pacotes",
     description: "Pacotes do sistema",
 };
 
 interface PacotesPageProps {
-    searchParams: { page?: string; orders_page?: string };
+    searchParams: Promise<{ page?: string; orders_page?: string }>;
 }
 
 export default async function pacotesPage({ searchParams }: PacotesPageProps) {
-    const params = searchParams || {};
+    const params = await searchParams;
     const currentPage = parseInt(params.page || "1", 10);
     const ordersPage = parseInt(params.orders_page || "1", 10);
 

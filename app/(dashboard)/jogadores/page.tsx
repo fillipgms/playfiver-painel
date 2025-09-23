@@ -10,7 +10,7 @@ import PaginationControls from "@/components/PaginationControls";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-    title: "Playfiver - Jogadores",
+    title: "Jogadores",
     description: "Jogadores do sistema",
 };
 
