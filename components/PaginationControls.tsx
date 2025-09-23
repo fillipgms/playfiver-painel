@@ -32,6 +32,7 @@ export default function PaginationControls({
         const params = new URLSearchParams(searchParamsHook.toString());
         params.set(paramKey, newPage.toString());
         router.push(`${baseUrl}?${params.toString()}`);
+        router.refresh();
     };
 
     const goToPreviousPage = () => {
