@@ -53,7 +53,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
         const fetchCarteiras = async () => {
             try {
                 const carteirasData = await getWalletsData();
-                setCarteiras(carteirasData);
+                setCarteiras(carteirasData?.data || []);
             } catch (error) {
                 console.error("Error loading carteiras:", error);
             }
