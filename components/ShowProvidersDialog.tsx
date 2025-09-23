@@ -12,12 +12,11 @@ import Button from "./Button";
 import React from "react";
 
 const ShowProvidersDialog = ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     providers,
 }: {
     providers: { name: string }[];
 }) => {
-    console.log(providers);
-
     return (
         <Dialog>
             <DialogTrigger asChild>

@@ -98,8 +98,6 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
             }
         );
 
-        console.log(data);
-
         if (!data) {
             throw new Error("No valid data received from API");
         }

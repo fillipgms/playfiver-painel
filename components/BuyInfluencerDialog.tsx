@@ -89,8 +89,6 @@ const BuyInfluencerDialog: React.FC<BuyInfluencerDialogProps> = ({
             const data = await createInfluencerOrder(payload);
             setOrderResponse(data);
 
-            console.log(data);
-
             if (data?.idTransaction) setOrderId(String(data.idTransaction));
         } catch (e) {
             console.error(e);

@@ -153,8 +153,6 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
             const data = (await createOrder(payload)) as OrderResponse;
             setOrderResponse(data);
 
-            console.log(data);
-
             if (data?.idTransaction) setOrderId(String(data.idTransaction));
         } catch (e) {
             console.error(e);

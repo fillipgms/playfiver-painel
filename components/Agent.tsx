@@ -46,8 +46,6 @@ const Agent = React.forwardRef<
         onActionHappen();
     };
 
-    console.log(agent);
-
     const handleEdit = () => {
         setShowEdit(true);
     };

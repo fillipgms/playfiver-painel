@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 
 interface PaginationControlsProps {
@@ -21,14 +20,22 @@ export default function PaginationControls({
     hasNextPage,
     hasPrevPage,
     baseUrl,
+    searchParams,
     paramKey = "page",
     compact = false,
     hideWhenSinglePage = true,
 }: PaginationControlsProps) {
-    const searchParamsHook = useSearchParams();
-
     const buildHref = (newPage: number) => {
-        const params = new URLSearchParams(searchParamsHook.toString());
+        const params = new URLSearchParams();
+        Object.entries(searchParams).forEach(([key, value]) => {
+            if (value) {
+                if (Array.isArray(value)) {
+                    value.forEach((v) => params.append(key, v));
+                } else {
+                    params.set(key, value);
+                }
+            }
+        });
         params.set(paramKey, newPage.toString());
         return `${baseUrl}?${params.toString()}`;
     };

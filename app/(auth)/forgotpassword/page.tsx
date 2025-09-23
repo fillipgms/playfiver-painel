@@ -22,7 +22,6 @@ export default function ForgotPasswordPage() {
         const formData = new FormData(e.target as HTMLFormElement);
         const result = await forgotPassword(formData.get("email") as string);
 
-        console.log(result);
         if (!result.status) {
             setSuccess(result.message || "Código enviado para seu email");
         } else {

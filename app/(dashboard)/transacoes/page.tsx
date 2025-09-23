@@ -25,8 +25,6 @@ export default async function TransacoesPage({
 
     const res = await getTransactionsData(page, search);
 
-    console.log(res);
-
     const transactions = res.data;
 
     return (
