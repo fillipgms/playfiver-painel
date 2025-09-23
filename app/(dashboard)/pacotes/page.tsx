@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 };
 
 interface PacotesPageProps {
-    searchParams: Promise<{ page?: string; orders_page?: string }>;
+    searchParams: { page?: string; orders_page?: string };
 }
 
 export default async function pacotesPage({ searchParams }: PacotesPageProps) {
-    const params = await searchParams;
+    const params = searchParams || {};
     const currentPage = parseInt(params.page || "1", 10);
     const ordersPage = parseInt(params.orders_page || "1", 10);
 
