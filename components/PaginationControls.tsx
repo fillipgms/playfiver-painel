@@ -1,5 +1,6 @@
 "use client";
-import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 
@@ -25,32 +26,12 @@ export default function PaginationControls({
     compact = false,
     hideWhenSinglePage = true,
 }: PaginationControlsProps) {
-    const router = useRouter();
     const searchParamsHook = useSearchParams();
 
-    const updatePage = (newPage: number) => {
+    const buildHref = (newPage: number) => {
         const params = new URLSearchParams(searchParamsHook.toString());
         params.set(paramKey, newPage.toString());
-        router.push(`${baseUrl}?${params.toString()}`);
-        router.refresh();
-    };
-
-    const goToPreviousPage = () => {
-        if (hasPrevPage) {
-            updatePage(currentPage - 1);
-        }
-    };
-
-    const goToNextPage = () => {
-        if (hasNextPage) {
-            updatePage(currentPage + 1);
-        }
-    };
-
-    const goToPage = (page: number) => {
-        if (page >= 1 && page <= lastPage && page !== currentPage) {
-            updatePage(page);
-        }
+        return `${baseUrl}?${params.toString()}`;
     };
 
     if (hideWhenSinglePage && lastPage <= 1) {
@@ -63,11 +44,19 @@ export default function PaginationControls({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={goToPreviousPage}
                     disabled={!hasPrevPage}
                     className="p-2 h-8 w-8 min-w-0 cursor-pointer"
                 >
-                    <CaretLeftIcon size={16} />
+                    <Link
+                        href={buildHref(currentPage - 1)}
+                        aria-disabled={!hasPrevPage}
+                        tabIndex={hasPrevPage ? 0 : -1}
+                        onClick={(e) => {
+                            if (!hasPrevPage) e.preventDefault();
+                        }}
+                    >
+                        <CaretLeftIcon size={16} />
+                    </Link>
                 </Button>
 
                 <span className="text-sm text-foreground/70">
@@ -77,11 +66,19 @@ export default function PaginationControls({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={goToNextPage}
                     disabled={!hasNextPage}
                     className="p-2 h-8 w-8 min-w-0 cursor-pointer"
                 >
-                    <CaretRightIcon size={16} />
+                    <Link
+                        href={buildHref(currentPage + 1)}
+                        aria-disabled={!hasNextPage}
+                        tabIndex={hasNextPage ? 0 : -1}
+                        onClick={(e) => {
+                            if (!hasNextPage) e.preventDefault();
+                        }}
+                    >
+                        <CaretRightIcon size={16} />
+                    </Link>
                 </Button>
             </div>
         );
@@ -122,12 +119,21 @@ export default function PaginationControls({
             <Button
                 variant="outline"
                 size="sm"
-                onClick={goToPreviousPage}
                 disabled={!hasPrevPage}
                 className="flex items-center gap-1 cursor-pointer"
             >
-                <CaretLeftIcon size={16} />
-                Anterior
+                <Link
+                    href={buildHref(currentPage - 1)}
+                    aria-disabled={!hasPrevPage}
+                    tabIndex={hasPrevPage ? 0 : -1}
+                    className="flex items-center gap-1"
+                    onClick={(e) => {
+                        if (!hasPrevPage) e.preventDefault();
+                    }}
+                >
+                    <CaretLeftIcon size={16} />
+                    Anterior
+                </Link>
             </Button>
 
             <div className="flex items-center gap-1">
@@ -148,17 +154,29 @@ export default function PaginationControls({
 
                     return (
                         <Button
+                            asChild
                             key={pageNumber}
                             variant={isCurrentPage ? "default" : "outline"}
                             size="sm"
-                            onClick={() => goToPage(pageNumber)}
                             className={`min-w-[40px] ${
                                 isCurrentPage
                                     ? "bg-primary text-primary-foreground"
                                     : "cursor-pointer"
                             }`}
                         >
-                            {pageNumber}
+                            <Link
+                                href={buildHref(pageNumber)}
+                                aria-current={
+                                    isCurrentPage ? "page" : undefined
+                                }
+                                aria-disabled={isCurrentPage}
+                                tabIndex={isCurrentPage ? -1 : 0}
+                                onClick={(e) => {
+                                    if (isCurrentPage) e.preventDefault();
+                                }}
+                            >
+                                {pageNumber}
+                            </Link>
                         </Button>
                     );
                 })}
@@ -167,12 +185,21 @@ export default function PaginationControls({
             <Button
                 variant="outline"
                 size="sm"
-                onClick={goToNextPage}
                 disabled={!hasNextPage}
                 className="flex items-center gap-1 cursor-pointer"
             >
-                Próxima
-                <CaretRightIcon size={16} />
+                <Link
+                    href={buildHref(currentPage + 1)}
+                    aria-disabled={!hasNextPage}
+                    tabIndex={hasNextPage ? 0 : -1}
+                    className="flex items-center gap-1"
+                    onClick={(e) => {
+                        if (!hasNextPage) e.preventDefault();
+                    }}
+                >
+                    Próxima
+                    <CaretRightIcon size={16} />
+                </Link>
             </Button>
         </div>
     );
