@@ -1,15 +1,16 @@
 import { Card, CardContent, CardHeader } from "@/components/Card";
-import Carteira from "@/components/Carteira";
 import Icon from "@/components/Icon";
-import { ShoppingCartIcon, StarIcon } from "@phosphor-icons/react/dist/ssr";
-import Order from "@/components/Order";
+import { StarIcon } from "@phosphor-icons/react/dist/ssr";
+
 import BuyInfluencerDialog from "@/components/BuyInfluencerDialog";
 import { Metadata } from "next";
 import { getWalletsData } from "@/actions/carteiras";
 import { getSignatureData } from "@/actions/signature";
 import { getOrdersData } from "@/actions/orders";
-import PaginationControls from "@/components/PaginationControls";
+
 import { redirect } from "next/navigation";
+import CarteirasClient from "./CarteirasClient";
+import OrdersClient from "./OrdersClient";
 
 export const metadata: Metadata = {
     title: "Pacotes",
@@ -36,30 +37,11 @@ export default async function pacotesPage({ searchParams }: PacotesPageProps) {
 
         return (
             <main className="space-y-8">
-                <section className="space-y-4">
-                    <h2 className="text-2xl font-bold ">Pacotes</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-2 sm:px-4 lg:px-0">
-                        {carteiras.map((carteira, i) => (
-                            <div key={carteira.id} id={`carteira-${i}`}>
-                                <Carteira
-                                    index={
-                                        (carteirasData.from || 1) - 1 + i + 1
-                                    }
-                                    carteira={carteira}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                <CarteirasClient
+                    carteirasData={carteirasData}
+                    carteiras={carteiras}
+                />
 
-                    <PaginationControls
-                        currentPage={carteirasData.current_page}
-                        lastPage={carteirasData.last_page}
-                        hasNextPage={!!carteirasData.next_page_url}
-                        hasPrevPage={!!carteirasData.prev_page_url}
-                        baseUrl="/pacotes"
-                        searchParams={params}
-                    />
-                </section>
                 <div className="space-y-4">
                     <h2 className="text-2xl font-bold">Outras Informações</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -97,35 +79,7 @@ export default async function pacotesPage({ searchParams }: PacotesPageProps) {
                             </Card>
                         </section>
 
-                        <section>
-                            <Card id="transactions-section">
-                                <CardHeader>
-                                    <Icon>
-                                        <ShoppingCartIcon />
-                                    </Icon>
-                                    <span className="text-xl font-bold">
-                                        Compras Recentes
-                                    </span>
-                                </CardHeader>
-                                <CardContent className="space-y-2">
-                                    {pedidos.data.map((order: OrderProps) => (
-                                        <Order key={order.id} order={order} />
-                                    ))}
-                                </CardContent>
-
-                                <PaginationControls
-                                    currentPage={pedidos.current_page}
-                                    lastPage={pedidos.last_page}
-                                    hasNextPage={!!pedidos.next_page_url}
-                                    hasPrevPage={!!pedidos.prev_page_url}
-                                    baseUrl="/pacotes"
-                                    searchParams={params}
-                                    paramKey="orders_page"
-                                    compact
-                                    hideWhenSinglePage={false}
-                                />
-                            </Card>
-                        </section>
+                        <OrdersClient pedidos={pedidos} />
                     </div>
                 </div>
             </main>
