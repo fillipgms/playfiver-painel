@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -24,17 +25,11 @@ export default function Error({
                     Tente novamente ou volte para a página inicial.
                 </p>
                 <div className="flex items-center justify-center gap-3">
-                    <button
-                        onClick={() => reset()}
-                        className="px-4 py-2 rounded bg-foreground text-background hover:opacity-80 transition"
-                    >
+                    <Button variant="secondary" onClick={() => reset()}>
                         Tentar novamente
-                    </button>
-                    <Link
-                        href="/"
-                        className="px-4 py-2 rounded border border-foreground/30 hover:bg-foreground/10 transition"
-                    >
-                        Início
+                    </Button>
+                    <Link href="/">
+                        <Button>Voltar para início</Button>
                     </Link>
                 </div>
             </div>

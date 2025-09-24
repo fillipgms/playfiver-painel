@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -26,17 +27,11 @@ export default function GlobalError({
                         {error?.digest ? `(id: ${error.digest})` : ""}
                     </p>
                     <div className="flex items-center justify-center gap-3">
-                        <button
-                            onClick={() => reset()}
-                            className="px-4 py-2 rounded bg-white text-black hover:bg-gray-200 transition"
-                        >
+                        <Button variant="secondary" onClick={() => reset()}>
                             Tentar novamente
-                        </button>
-                        <Link
-                            href="/"
-                            className="px-4 py-2 rounded border border-white/30 hover:bg-white/10 transition"
-                        >
-                            Voltar para início
+                        </Button>
+                        <Link href="/">
+                            <Button>Voltar para início</Button>
                         </Link>
                     </div>
                 </div>
