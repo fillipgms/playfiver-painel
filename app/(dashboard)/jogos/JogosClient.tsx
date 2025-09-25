@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { getGamesData } from "@/actions/jogos";
-import { getWalletsData } from "@/actions/carteiras";
+import { getAllWalletsData } from "@/actions/carteiras";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/Card";
@@ -48,11 +48,10 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
     const observerRef = useRef<HTMLDivElement>(null);
 
-    // Buscar carteiras ao carregar o componente
     useEffect(() => {
         const fetchCarteiras = async () => {
             try {
-                const carteirasData = await getWalletsData();
+                const carteirasData = await getAllWalletsData();
                 setCarteiras(carteirasData?.data || []);
             } catch (error) {
                 console.error("Error loading carteiras:", error);
@@ -61,6 +60,7 @@ export default function JogosClient({ initialData }: JogosClientProps) {
 
         fetchCarteiras();
     }, []);
+
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
     const pathname = usePathname();
