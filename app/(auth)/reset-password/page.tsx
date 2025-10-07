@@ -69,18 +69,24 @@ function ResetPasswordForm() {
             token
         );
 
-        if (result.success) {
-            const result = await signIn(formData);
+        if (result.status === true) {
+            const loginData = new FormData();
+            loginData.append("email", email);
+            loginData.append("password", password);
+
+            const result = await signIn(loginData);
+
             if (result.success) {
                 redirect("/");
             } else {
                 setError(result.message || "Ocorreu um erro ao fazer login");
                 if (result.errors) {
+                    // setError(JSON.stringify(result.errors));
                     setFieldErrors(result.errors);
                 }
             }
         } else {
-            setError(result.message || "Ocorreu um erro ao criar a conta");
+            setError(result.message || "Ocorreu um erro ao alterar a senha");
             if (result.errors) {
                 setFieldErrors(result.errors as Record<string, string[]>);
             }
