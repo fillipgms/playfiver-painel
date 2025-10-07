@@ -69,7 +69,7 @@ function ResetPasswordForm() {
             token
         );
 
-        if (result.status === true) {
+        if (result.status) {
             const loginData = new FormData();
             loginData.append("email", email);
             loginData.append("password", password);

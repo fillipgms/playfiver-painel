@@ -159,6 +159,16 @@ export async function resetPassword(
                 );
             }
         }
+
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 500) {
+                await clearExpiredSession();
+                throw new Error(
+                    "Link inválido. Por favor, solicite um novo link de redefinição de senha."
+                );
+            }
+        }
+
         console.error("Failed to reset password:", error);
         return null;
     }
