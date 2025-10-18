@@ -5,6 +5,7 @@ import { LockKeyIcon, SealCheckIcon, CopySimple } from "@phosphor-icons/react";
 import { twMerge } from "tailwind-merge";
 import Button from "./Button";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Badge = ({
     active,
@@ -33,6 +34,7 @@ const Game = ({
     id: string;
     isPinnedForced?: boolean;
 }) => {
+    const router = useRouter();
     const containerRef = useRef<HTMLDivElement>(null);
     const [alignRight, setAlignRight] = useState(false);
     const [verticalAlign, setVerticalAlign] = useState<"top" | "bottom" | null>(
@@ -53,6 +55,12 @@ const Game = ({
             console.error(err);
             toast.error(`Falha ao copiar ${label.toLowerCase()}.`);
         }
+    };
+
+    const handleEnableGame = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // Redireciona para a página de pacotes com filtro pelo provedor do jogo
+        router.push(`/pacotes?provedor=${game.provedorId}&page=1`);
     };
 
     useEffect(() => {
@@ -191,6 +199,11 @@ const Game = ({
                     >
                         <CopySimple /> Copiar imagem
                     </Button>
+                    {game.blocked && (
+                        <Button onClick={handleEnableGame}>
+                            Habilitar Jogo
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

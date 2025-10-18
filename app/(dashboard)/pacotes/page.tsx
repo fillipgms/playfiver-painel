@@ -18,7 +18,11 @@ export const metadata: Metadata = {
 };
 
 interface PacotesPageProps {
-    searchParams: Promise<{ page?: string; orders_page?: string }>;
+    searchParams: Promise<{
+        page?: string;
+        orders_page?: string;
+        provedor?: string;
+    }>;
 }
 
 export default async function pacotesPage({ searchParams }: PacotesPageProps) {
