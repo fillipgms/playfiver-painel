@@ -34,11 +34,11 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
-            <div className="md:w-1/2 w-full flex justify-center items-center">
+        <main className="h-screen flex p-8 gap-8 bg-linear-to-b from-primary/50 to-background-primary items-center justify-center text-foreground">
+            <div className="flex justify-center items-center bg-background-secondary rounded-md shadow p-8 h-fit">
                 <form onSubmit={onSubmit} className="space-y-8 w-xs">
                     <div>
-                        <h1 className="font-bold text-xl">
+                        <h1 className="font-bold text-center text-xl">
                             Bem vindo de volta
                         </h1>
                         <p></p>
@@ -135,7 +135,6 @@ export default function LoginPage() {
                     </div>
                 </form>
             </div>
-            <div className="md:w-1/2 w-full bg-radial from-primary to-[#005EBD] rounded-md overflow-hidden"></div>
         </main>
     );
 }

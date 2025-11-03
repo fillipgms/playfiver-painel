@@ -8,11 +8,13 @@ import {
     ArrowDownIcon,
     ArrowUpIcon,
     EqualsIcon,
+    InfoIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { twMerge } from "tailwind-merge";
 import { getWalletGGr } from "@/actions/carteiras";
 
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const formatCurrencyBRL = (value: number): string =>
     new Intl.NumberFormat("pt-BR", {
@@ -213,9 +215,26 @@ const Carteira = ({
                     className="grid grid-cols-2 gap-4"
                 >
                     <div className="space-y-1">
-                        <p className="text-sm text-foreground/70 font-medium">
-                            Apostas Perdidas
-                        </p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-foreground/70 font-medium">
+                                Apostas Perdidas
+                            </p>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <InfoIcon />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <div>
+                                        <p>O valor aqui não reflete</p>
+                                        <p>
+                                            diretamente o seu saldo, apenas o
+                                            valor
+                                        </p>
+                                        <p>que foi perdido pelos usuários.</p>
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                         <div className="flex gap-2 items-center">
                             {totalPerdidos > 0 ? (
                                 <>
@@ -240,9 +259,27 @@ const Carteira = ({
                     </div>
 
                     <div className="space-y-1">
-                        <p className="text-sm text-foreground/70 font-medium">
-                            Apostas Ganhas
-                        </p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-foreground/70 font-medium">
+                                Apostas Ganhas
+                            </p>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <InfoIcon />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="">
+                                    <div>
+                                        <p>O valor aqui não reflete</p>
+                                        <p>
+                                            diretamente o seu saldo, apenas o
+                                            valor
+                                        </p>
+                                        <p>que foi ganho pelos usuários.</p>
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                         <div className="flex gap-2 items-center">
                             {totalGanhos > 0 ? (
                                 <>

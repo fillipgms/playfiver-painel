@@ -98,8 +98,8 @@ export default function RegisterPage() {
 
     if (step === "verification") {
         return (
-            <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
-                <div className="md:w-1/2 w-full flex justify-center items-center">
+            <main className="h-screen flex p-8 gap-8 bg-linear-to-b from-primary/50 to-background-primary items-center justify-center text-foreground">
+                <div className="flex justify-center items-center bg-background-secondary rounded-md shadow p-8 h-fit">
                     <form onSubmit={onRegister} className="space-y-8 w-xs">
                         <div>
                             <h1 className="font-bold text-xl">
@@ -173,8 +173,8 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="h-screen flex p-8 gap-8 bg-background-secondary text-foreground">
-            <div className="md:w-1/2 w-full flex justify-center items-center">
+        <main className="h-screen flex p-8 gap-8 bg-linear-to-b from-primary/50 to-background-primary items-center justify-center text-foreground">
+            <div className="flex justify-center items-center bg-background-secondary rounded-md shadow p-8 h-fit">
                 <form onSubmit={onRequestCode} className="space-y-8 w-xs">
                     <div>
                         <h1 className="font-bold text-xl">Criar Conta</h1>
@@ -220,85 +220,94 @@ export default function RegisterPage() {
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label className="capitalize" htmlFor="password">
-                                Senha
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    id="password"
-                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    aria-label={
-                                        showPassword
-                                            ? "Ocultar senha"
-                                            : "Mostrar senha"
-                                    }
-                                    onClick={() => setShowPassword((v) => !v)}
-                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex flex-col gap-1">
+                                <label
+                                    className="capitalize"
+                                    htmlFor="password"
                                 >
-                                    {showPassword ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
-                                </button>
+                                    Senha
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        name="password"
+                                        id="password"
+                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        aria-label={
+                                            showPassword
+                                                ? "Ocultar senha"
+                                                : "Mostrar senha"
+                                        }
+                                        onClick={() =>
+                                            setShowPassword((v) => !v)
+                                        }
+                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
+                                {fieldErrors.password && (
+                                    <p className="text-sm text-[#E53935]">
+                                        {fieldErrors.password[0]}
+                                    </p>
+                                )}
                             </div>
-                            {fieldErrors.password && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.password[0]}
-                                </p>
-                            )}
-                        </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label
-                                className="capitalize"
-                                htmlFor="confirmPassword"
-                            >
-                                Repetir Senha
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={
-                                        showConfirmPassword
-                                            ? "text"
-                                            : "password"
-                                    }
-                                    name="confirmPassword"
-                                    id="confirmPassword"
-                                    className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    aria-label={
-                                        showConfirmPassword
-                                            ? "Ocultar confirmação"
-                                            : "Mostrar confirmação"
-                                    }
-                                    onClick={() =>
-                                        setShowConfirmPassword((v) => !v)
-                                    }
-                                    className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                            <div className="flex flex-col gap-1">
+                                <label
+                                    className="capitalize"
+                                    htmlFor="confirmPassword"
                                 >
-                                    {showConfirmPassword ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
-                                </button>
+                                    Repetir Senha
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={
+                                            showConfirmPassword
+                                                ? "text"
+                                                : "password"
+                                        }
+                                        name="confirmPassword"
+                                        id="confirmPassword"
+                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        aria-label={
+                                            showConfirmPassword
+                                                ? "Ocultar confirmação"
+                                                : "Mostrar confirmação"
+                                        }
+                                        onClick={() =>
+                                            setShowConfirmPassword((v) => !v)
+                                        }
+                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                </div>
+                                {fieldErrors.confirmPassword && (
+                                    <p className="text-sm text-[#E53935]">
+                                        {fieldErrors.confirmPassword[0]}
+                                    </p>
+                                )}
                             </div>
-                            {fieldErrors.confirmPassword && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.confirmPassword[0]}
-                                </p>
-                            )}
                         </div>
 
                         <div className="text-sm text-[#E53935]">
@@ -329,7 +338,6 @@ export default function RegisterPage() {
                     </div>
                 </form>
             </div>
-            <div className="md:w-1/2 w-full bg-radial from-primary to-[#005EBD] rounded-md overflow-hidden"></div>
         </main>
     );
 }

@@ -13,6 +13,9 @@ interface TransactionsPageProps {
     searchParams: Promise<{
         page?: string;
         search?: string;
+        dateStart?: string;
+        dateEnd?: string;
+        agent?: string;
     }>;
 }
 
@@ -22,8 +25,17 @@ export default async function TransacoesPage({
     const resolvedSearchParams = await searchParams;
     const page = parseInt(resolvedSearchParams.page || "1");
     const search = resolvedSearchParams.search || "";
+    const dateStart = resolvedSearchParams.dateStart || "";
+    const dateEnd = resolvedSearchParams.dateEnd || "";
+    const agent = resolvedSearchParams.agent || "";
 
-    const res = await getTransactionsData(page, search);
+    const res = await getTransactionsData(
+        page,
+        search,
+        dateStart,
+        dateEnd,
+        agent
+    );
 
     const transactions = res.data;
 

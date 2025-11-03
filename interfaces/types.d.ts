@@ -229,3 +229,64 @@ interface Tour {
     tour: string;
     steps: TourStep[];
 }
+
+interface LogResponseProps {
+    current_page: number;
+    data: LogProps[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Array<{
+        url: string | null;
+        label: string;
+        active: boolean;
+    }>;
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}
+
+interface LogProps {
+    id: number;
+    agente: AgentOption;
+    gravity: string;
+    type: string;
+    data: LogDataProps;
+    created_at: string;
+}
+
+interface AgentOption {
+    code: string;
+    memo: string;
+}
+
+interface LogDataProps {
+    body: LogBodyProps;
+    status: number;
+    titulo: string;
+    mensagem: string;
+}
+
+interface LogBodyProps {
+    msg: string;
+    balance: number;
+}
+
+interface TransactionFilters {
+    page?: number;
+    search?: string;
+    dateStart?: string;
+    dateEnd?: string;
+    agent?: string;
+}
+
+interface LogsFilters {
+    page?: number;
+    dateStart?: string;
+    dateEnd?: string;
+    agent?: string;
+}

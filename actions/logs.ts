@@ -4,9 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
-export async function getTransactionsData(
+export async function getLogsData(
     page: number = 1,
-    search: string = "",
     dateStart: string = "",
     dateEnd: string = "",
     agent: string = ""
@@ -18,9 +17,7 @@ export async function getTransactionsData(
     }
 
     try {
-        let url = `https://api.testeplayfiver.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
-            search
-        )}&agent=${encodeURIComponent(agent)}`;
+        let url = `https://api.testeplayfiver.com/api/panel/logs?page=${page}&agent=${agent}`;
 
         if (dateStart) {
             const date = new Date(dateStart);
@@ -44,8 +41,6 @@ export async function getTransactionsData(
             url += `&dateEnd=${encodeURIComponent(formattedDate)}`;
         }
 
-        console.log(url);
-
         const { data } = await axios.get(url, {
             timeout: 5000,
             headers: {
@@ -60,10 +55,11 @@ export async function getTransactionsData(
 
         return data;
     } catch (error) {
-        console.error("Failed to fetch transactions:", error);
+        console.error("Failed to fetch logs data:", error);
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
 
+        // Check if it's an auth error and redirect
         if (
             axios.isAxiosError(error) &&
             (error.response?.status === 401 || error.response?.status === 403)
@@ -73,7 +69,10 @@ export async function getTransactionsData(
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar transações")
+                getFriendlyHttpErrorMessage(
+                    error,
+                    "Falha ao buscar dados dos logs"
+                )
         );
     }
 }

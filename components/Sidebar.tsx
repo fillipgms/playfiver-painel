@@ -14,6 +14,7 @@ import {
     ArrowsLeftRightIcon,
     DoorOpenIcon,
     FileTextIcon,
+    ScrollIcon,
 } from "@phosphor-icons/react";
 import GridIcon from "@/public/GridIcon";
 
@@ -51,6 +52,11 @@ const links = [
                 name: "Transações",
                 url: "/transacoes",
             },
+            {
+                icon: <ScrollIcon size={24} />,
+                name: "Logs",
+                url: "/logs",
+            },
         ],
     },
     {
@@ -69,7 +75,7 @@ const links = [
             {
                 icon: <FileTextIcon size={24} />,
                 name: "documentação",
-                url: "https://api.playfivers.com/docs/api",
+                url: "https://api.testeplayfiver.com/docs/api",
             },
         ],
     },

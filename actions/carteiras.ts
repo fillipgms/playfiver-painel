@@ -13,7 +13,7 @@ export async function getWalletsData(page: number = 1) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/wallet?page=${page}`,
+            `https://api.testeplayfiver.com/api/panel/wallet?page=${page}`,
             {
                 timeout: 10000,
                 headers: {
@@ -61,7 +61,7 @@ export async function getAllWalletsData() {
 
         while (hasMore) {
             const { data } = await axios.get(
-                `https://api.playfivers.com/api/panel/wallet?page=${currentPage}`,
+                `https://api.testeplayfiver.com/api/panel/wallet?page=${currentPage}`,
                 {
                     timeout: 10000,
                     headers: {
@@ -122,7 +122,7 @@ export async function getWalletGGr(id: number) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/ggr?type=${id}`,
+            `https://api.testeplayfiver.com/api/panel/ggr?type=${id}`,
             {
                 timeout: 10000,
                 headers: {
