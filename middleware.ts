@@ -26,7 +26,8 @@ export function middleware(request: NextRequest) {
         request.nextUrl.pathname === "/login" ||
         request.nextUrl.pathname === "/register" ||
         request.nextUrl.pathname === "/forgotpassword" ||
-        request.nextUrl.pathname === "/reset-password";
+        request.nextUrl.pathname === "/reset-password" ||
+        request.nextUrl.pathname === "/termos";
 
     if (isLoggedIn && isLoginRoute) {
         return NextResponse.redirect(new URL("/", request.url));

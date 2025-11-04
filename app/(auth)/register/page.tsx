@@ -174,169 +174,187 @@ export default function RegisterPage() {
 
     return (
         <main className="h-screen flex p-8 gap-8 bg-linear-to-b from-primary/50 to-background-primary items-center justify-center text-foreground">
-            <div className="flex justify-center items-center bg-background-secondary rounded-md shadow p-8 h-fit">
-                <form onSubmit={onRequestCode} className="space-y-8 w-xs">
-                    <div>
-                        <h1 className="font-bold text-xl">Criar Conta</h1>
+            <div className="flex justify-center items-center bg-background-secondary rounded-md shadow  h-fit">
+                <div className="max-h-96 overflow-y-auto p-8">
+                    <form onSubmit={onRequestCode} className="space-y-8 w-xs">
+                        <div className="text-center">
+                            <h1 className="font-bold text-xl">Criar Conta</h1>
+                            <p className="text-sm text-foreground/70">
+                                Preencha os dados abaixo para criar sua conta
+                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-1">
+                                <label className="capitalize" htmlFor="name">
+                                    Nome
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    className="w-full border py-1 rounded border-foreground/20"
+                                    required
+                                />
+                                {fieldErrors.name && (
+                                    <p className="text-sm text-[#E53935]">
+                                        {fieldErrors.name[0]}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="capitalize" htmlFor="email">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    className="w-full border py-1 rounded border-foreground/20"
+                                    required
+                                />
+                                {fieldErrors.email && (
+                                    <p className="text-sm text-[#E53935]">
+                                        {fieldErrors.email[0]}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <label
+                                        className="capitalize"
+                                        htmlFor="password"
+                                    >
+                                        Senha
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={
+                                                showPassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            name="password"
+                                            id="password"
+                                            className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            aria-label={
+                                                showPassword
+                                                    ? "Ocultar senha"
+                                                    : "Mostrar senha"
+                                            }
+                                            onClick={() =>
+                                                setShowPassword((v) => !v)
+                                            }
+                                            className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    {fieldErrors.password && (
+                                        <p className="text-sm text-[#E53935]">
+                                            {fieldErrors.password[0]}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <label
+                                        className="capitalize"
+                                        htmlFor="confirmPassword"
+                                    >
+                                        Repetir Senha
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={
+                                                showConfirmPassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            name="confirmPassword"
+                                            id="confirmPassword"
+                                            className="w-full border py-1 rounded border-foreground/20 pr-9"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            aria-label={
+                                                showConfirmPassword
+                                                    ? "Ocultar confirmação"
+                                                    : "Mostrar confirmação"
+                                            }
+                                            onClick={() =>
+                                                setShowConfirmPassword(
+                                                    (v) => !v
+                                                )
+                                            }
+                                            className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
+                                        >
+                                            {showConfirmPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    {fieldErrors.confirmPassword && (
+                                        <p className="text-sm text-[#E53935]">
+                                            {fieldErrors.confirmPassword[0]}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="text-sm text-[#E53935]">
+                                {error && <p>Erro: {error}</p>}
+                            </div>
+
+                            <div className="text-sm text-green-600">
+                                {success && <p>{success}</p>}
+                            </div>
+                        </div>
+
+                        <Button className="w-full">Solicitar Código</Button>
+
                         <p className="text-sm text-foreground/70">
-                            Preencha os dados abaixo para criar sua conta
+                            Ao criar uma conta, você concorda com nossos{" "}
+                            <Link
+                                href="/termos"
+                                className="underline text-primary"
+                            >
+                                Termos de Serviço
+                            </Link>
+                            . Ocasionalmente, enviaremos emails com atualizações
+                            importantes ou ofertas especiais.
                         </p>
-                    </div>
 
-                    <div className="space-y-4">
-                        <div className="flex flex-col gap-1">
-                            <label className="capitalize" htmlFor="name">
-                                Nome
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
-                            {fieldErrors.name && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.name[0]}
-                                </p>
-                            )}
+                        <div className="w-full flex items-center gap-2">
+                            <span className="w-full block h-0.5 bg-foreground/20" />
+                            <span className="text-sm">Ou</span>
+                            <span className="w-full block h-0.5 bg-foreground/20" />
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label className="capitalize" htmlFor="email">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="w-full border py-1 rounded border-foreground/20"
-                                required
-                            />
-                            {fieldErrors.email && (
-                                <p className="text-sm text-[#E53935]">
-                                    {fieldErrors.email[0]}
-                                </p>
-                            )}
+                        <div className="flex gap-1 text-sm justify-center">
+                            <p>Já tem uma conta?</p>
+                            <Link
+                                href="/login"
+                                className="underline text-primary flex gap-1 items-center"
+                            >
+                                Faça login
+                            </Link>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
-                                <label
-                                    className="capitalize"
-                                    htmlFor="password"
-                                >
-                                    Senha
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={
-                                            showPassword ? "text" : "password"
-                                        }
-                                        name="password"
-                                        id="password"
-                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        aria-label={
-                                            showPassword
-                                                ? "Ocultar senha"
-                                                : "Mostrar senha"
-                                        }
-                                        onClick={() =>
-                                            setShowPassword((v) => !v)
-                                        }
-                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-4 w-4" />
-                                        ) : (
-                                            <Eye className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                                {fieldErrors.password && (
-                                    <p className="text-sm text-[#E53935]">
-                                        {fieldErrors.password[0]}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                                <label
-                                    className="capitalize"
-                                    htmlFor="confirmPassword"
-                                >
-                                    Repetir Senha
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={
-                                            showConfirmPassword
-                                                ? "text"
-                                                : "password"
-                                        }
-                                        name="confirmPassword"
-                                        id="confirmPassword"
-                                        className="w-full border py-1 rounded border-foreground/20 pr-9"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        aria-label={
-                                            showConfirmPassword
-                                                ? "Ocultar confirmação"
-                                                : "Mostrar confirmação"
-                                        }
-                                        onClick={() =>
-                                            setShowConfirmPassword((v) => !v)
-                                        }
-                                        className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
-                                    >
-                                        {showConfirmPassword ? (
-                                            <EyeOff className="h-4 w-4" />
-                                        ) : (
-                                            <Eye className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                                {fieldErrors.confirmPassword && (
-                                    <p className="text-sm text-[#E53935]">
-                                        {fieldErrors.confirmPassword[0]}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="text-sm text-[#E53935]">
-                            {error && <p>Erro: {error}</p>}
-                        </div>
-
-                        <div className="text-sm text-green-600">
-                            {success && <p>{success}</p>}
-                        </div>
-                    </div>
-
-                    <Button className="w-full">Solicitar Código</Button>
-
-                    <div className="w-full flex items-center gap-2">
-                        <span className="w-full block h-0.5 bg-foreground/20" />
-                        <span className="text-sm">Ou</span>
-                        <span className="w-full block h-0.5 bg-foreground/20" />
-                    </div>
-
-                    <div className="flex gap-1 text-sm justify-center">
-                        <p>Já tem uma conta?</p>
-                        <Link
-                            href="/login"
-                            className="underline text-primary flex gap-1 items-center"
-                        >
-                            Faça login
-                        </Link>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </main>
     );
