@@ -19,7 +19,7 @@ export async function getAgentsData({
 
     try {
         const { data } = await axios.get(
-            `https://api.testeplayfiver.com/api/panel/agentes?page=${page}&search=${encodeURIComponent(
+            `https://api.playfivers.com/api/panel/agentes?page=${page}&search=${encodeURIComponent(
                 search
             )}`,
             {
@@ -79,7 +79,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
 
     try {
         const { data } = await axios.post(
-            "https://api.testeplayfiver.com/api/panel/agentes",
+            "https://api.playfivers.com/api/panel/agentes",
             {
                 agent_memo: payload.agent_memo,
                 agent_code: payload.agent_code,
@@ -164,7 +164,7 @@ export async function updateAgent(
 
     try {
         const { data } = await axios.put(
-            `https://api.testeplayfiver.com/api/panel/agentes/`,
+            `https://api.playfivers.com/api/panel/agentes/`,
             {
                 id_agente: agentId,
                 agent_memo: payload.agent_memo,
@@ -249,7 +249,7 @@ export async function deleteAgent(agentId: number) {
 
     try {
         const { data } = await axios.delete(
-            `https://api.testeplayfiver.com/api/panel/agentes/${agentId}`,
+            `https://api.playfivers.com/api/panel/agentes/${agentId}`,
             {
                 timeout: 5000,
                 headers: {

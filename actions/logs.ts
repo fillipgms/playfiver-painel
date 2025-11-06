@@ -17,7 +17,7 @@ export async function getLogsData(
     }
 
     try {
-        let url = `https://api.testeplayfiver.com/api/panel/logs?page=${page}&agent=${agent}`;
+        let url = `https://api.playfivers.com/api/panel/logs?page=${page}&agent=${agent}`;
 
         if (dateStart) {
             const date = new Date(dateStart);

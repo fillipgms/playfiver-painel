@@ -13,7 +13,7 @@ export async function updateProfile(name: string, email: string) {
 
     try {
         const { data } = await axios.put(
-            `https://api.testeplayfiver.com/api/panel/profile`,
+            `https://api.playfivers.com/api/panel/profile`,
             { name: name, email: email },
             {
                 timeout: 5000,

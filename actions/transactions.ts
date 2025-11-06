@@ -18,7 +18,7 @@ export async function getTransactionsData(
     }
 
     try {
-        let url = `https://api.testeplayfiver.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
+        let url = `https://api.playfivers.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
             search
         )}&agent=${encodeURIComponent(agent)}`;
 
