@@ -44,8 +44,6 @@ export async function getTransactionsData(
             url += `&dateEnd=${encodeURIComponent(formattedDate)}`;
         }
 
-        console.log(url);
-
         const { data } = await axios.get(url, {
             timeout: 5000,
             headers: {

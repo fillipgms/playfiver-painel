@@ -37,6 +37,7 @@ import {
     SelectLabel,
 } from "../ui/select";
 import { getAgentsData } from "@/actions/agents";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface TransactionProps {
@@ -165,29 +166,35 @@ const cols: ColDef<TransactionProps>[] = [
         cellRenderer: (p: ICellRendererParams) => {
             const isSuccess = p.value === 1;
 
+            const { obs } = p.data;
+
             return (
                 <div className="flex items-center justify-center h-full w-full">
-                    <div
-                        className={twMerge(
-                            "flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium",
-                            isSuccess
-                                ? "bg-[#95BD2B]/20 text-[#95BD2B]"
-                                : "bg-[#E53935]/20 text-[#E53935]"
-                        )}
-                    >
-                        {isSuccess ? (
+                    {isSuccess ? (
+                        <div
+                            className={twMerge(
+                                "flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium bg-[#95BD2B]/20 text-[#95BD2B]"
+                            )}
+                        >
                             <div className="size-fit">
                                 <CheckIcon size={12} />
                             </div>
-                        ) : (
-                            <div className="size-fit">
-                                <XIcon size={12} />
-                            </div>
-                        )}
-                        <p className="truncate">
-                            {isSuccess ? "Sucesso" : "Erro"}
-                        </p>
-                    </div>
+
+                            <p className="truncate">Sucesso</p>
+                        </div>
+                    ) : (
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium bg-[#E53935]/20 text-[#E53935]">
+                                <div className="size-fit">
+                                    <XIcon size={12} />
+                                </div>
+                                <p className="truncate">Erro</p>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{obs}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
                 </div>
             );
         },
@@ -392,6 +399,8 @@ const TransactionsTable = ({
             filters.agent
         );
     };
+
+    console.log(transactions);
 
     return (
         <div className="w-full space-y-6 overflow-hidden">
