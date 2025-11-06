@@ -24,9 +24,7 @@ export async function getLogsData(
             const month = String(date.getMonth() + 1).padStart(2, "0");
             const day = String(date.getDate()).padStart(2, "0");
             const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, "0");
-            const minutes = String(date.getMinutes()).padStart(2, "0");
-            const formattedDate = `${month}/${day}/${year} ${hours}:${minutes}:00`;
+            const formattedDate = `${month}/${day}/${year} 00:00:00`;
             url += `&dateStart=${encodeURIComponent(formattedDate)}`;
         }
 
@@ -35,9 +33,7 @@ export async function getLogsData(
             const month = String(date.getMonth() + 1).padStart(2, "0");
             const day = String(date.getDate()).padStart(2, "0");
             const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, "0");
-            const minutes = String(date.getMinutes()).padStart(2, "0");
-            const formattedDate = `${month}/${day}/${year} ${hours}:${minutes}:00`;
+            const formattedDate = `${month}/${day}/${year} 23:59:59`;
             url += `&dateEnd=${encodeURIComponent(formattedDate)}`;
         }
 
