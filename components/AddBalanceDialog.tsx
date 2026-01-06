@@ -273,9 +273,9 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                                 {formatCurrencyBRL(minTable)}
                             </p>
                         )}
-                        {amountNumber > 10000 && (
+                        {amountNumber > 20000 && (
                             <p className="text-xs text-[#E53935]">
-                                Valor máximo permitido é R$ 10.000,00
+                                Valor máximo permitido é R$ 20.000,00
                             </p>
                         )}
                     </div>
