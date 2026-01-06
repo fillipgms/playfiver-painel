@@ -252,6 +252,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             value={amount}
                             onAccept={(val: string) => setAmount(val)}
                             disabled={hasOrder || submitting}
+                            max={20000}
                             className="w-full rounded-md border border-foreground/20 px-3 py-2 outline-hidden focus:ring-2 focus:ring-foreground/30"
                         />
                         <p className="text-xs text-foreground/60">
