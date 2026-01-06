@@ -481,7 +481,7 @@ const AddBalanceDialog: React.FC<AddBalanceDialogProps> = ({
                             submitting ||
                             amountNumber <= 0 ||
                             (amountNumber > 0 && amountNumber < minTable) ||
-                            amountNumber > 10000 ||
+                            amountNumber > 20000 ||
                             (paymentType === "pix" &&
                                 cpfValue.replace(/\D/g, "").length !== 11)
                         }
