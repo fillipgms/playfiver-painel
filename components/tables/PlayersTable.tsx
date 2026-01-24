@@ -14,6 +14,7 @@ import { twMerge } from "tailwind-merge";
 import { MagnifyingGlassIcon, StarIcon } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import InfluencerConfirmationModal from "@/components/InfluencerConfirmationModal";
+import PlayerAgentFilter from "./PlayerAgentFilter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -31,22 +32,39 @@ interface PlayerProps {
     status: string;
 }
 
-const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
+const PlayersTable = ({
+    players,
+    agentes,
+}: {
+    players: PlayerProps[];
+    agentes: {
+        id: number;
+        agentCode: string;
+    }[];
+}) => {
     const [searchValue, setSearchValue] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const [showInfluencerModal, setShowInfluencerModal] = useState(false);
     const [pendingPlayer, setPendingPlayer] = useState<PlayerProps | null>(
-        null
+        null,
     );
     const gridRef = useRef<AgGridReact<PlayerProps>>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
     const searchTimeoutRef = useRef<NodeJS.Timeout>(null);
+    const [selectedAgent, setSelectedAgent] = useState("");
+
+    useEffect(() => {
+        const urlSearch = searchParams?.get("search") || "";
+        const urlAgent = searchParams?.get("agent") || "";
+        setSearchValue(urlSearch);
+        setSelectedAgent(urlAgent);
+    }, [searchParams]);
 
     const updatePlayerType = async (
         playerData: PlayerProps,
         nextVal: number,
-        p: ICellRendererParams
+        p: ICellRendererParams,
     ) => {
         const { id, rtp } = playerData;
         const t = toast.loading("Atualizando tipo...");
@@ -61,7 +79,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                     nextVal === 1
                         ? "Jogador marcado como Influencer"
                         : "Jogador marcado como Padrão",
-                    { id: t }
+                    { id: t },
                 );
                 p.node.setDataValue("is_influencer", nextVal);
             } else {
@@ -104,15 +122,29 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
         const isInfluencer = p.value === 1;
         const nextVal = isInfluencer ? 0 : 1;
 
-        // Se está tentando marcar como influenciador, mostrar modal
         if (nextVal === 1) {
             setPendingPlayer(playerData);
             setShowInfluencerModal(true);
             return;
         }
 
-        // Se está removendo influenciador, fazer direto
         await updatePlayerType(playerData, nextVal, p);
+    };
+
+    const handleAgentChange = (agentCode: string) => {
+        setSelectedAgent(agentCode);
+
+        const params = new URLSearchParams(searchParams?.toString() || "");
+
+        if (agentCode) {
+            params.set("agent", agentCode);
+        } else {
+            params.delete("agent");
+        }
+
+        params.set("page", "1"); // Reset to page 1
+
+        router.push(`/jogadores?${params.toString()}`);
     };
 
     const cols: ColDef<PlayerProps>[] = [
@@ -136,7 +168,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                                     "size-1 rounded-full",
                                     isOnline
                                         ? "bg-[#a4e100]"
-                                        : "bg-foreground/50"
+                                        : "bg-foreground/50",
                                 )}
                             />
                         </div>
@@ -164,7 +196,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                             onClick={() => handleToggleInfluencer(p)}
                             className={twMerge(
                                 "max-w-40 py-1 w-full text-center px-3",
-                                isInfluencer ? "" : "text-foreground/70"
+                                isInfluencer ? "" : "text-foreground/70",
                             )}
                             aria-label="Alternar tipo do jogador"
                         >
@@ -180,6 +212,16 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
             },
         },
         {
+            headerName: "Agente",
+            field: "agentCode",
+            flex: 1,
+            minWidth: 120,
+            filter: PlayerAgentFilter,
+            filterParams: {
+                agentes: agentes,
+            },
+        },
+        {
             headerName: "Apostas",
             field: "valor_debitado",
             flex: 1,
@@ -192,13 +234,13 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
             minWidth: 120,
             cellClass: (p) => {
                 const value = parseFloat(
-                    p.value?.replace("R$", "").replace(",", ".") || "0"
+                    p.value?.replace("R$", "").replace(",", ".") || "0",
                 );
                 return value > 0
                     ? "text-[#95BD2B] bg-background-primary"
                     : value < 0
-                    ? "text-[#E53935] bg-background-primary "
-                    : "text-foreground bg-background-primary";
+                      ? "text-[#E53935] bg-background-primary "
+                      : "text-foreground bg-background-primary";
             },
         },
         {
@@ -217,7 +259,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                 const current = String(p.value ?? "");
 
                 const onBlur = async (
-                    e: React.FocusEvent<HTMLInputElement>
+                    e: React.FocusEvent<HTMLInputElement>,
                 ) => {
                     const raw = e.target.value.trim().replace("%", "");
                     if (raw === current) return;
@@ -250,7 +292,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                                 result.message || "Erro ao atualizar RTP",
                                 {
                                     id: t,
-                                }
+                                },
                             );
                             e.target.value = current;
                         }
@@ -283,12 +325,6 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
                 );
             },
         },
-        {
-            headerName: "Agente",
-            field: "agentCode",
-            flex: 1,
-            minWidth: 120,
-        },
     ];
 
     useEffect(() => {
@@ -316,7 +352,6 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
             params.set("page", "1");
 
             router.push(`/jogadores?${params.toString()}`);
-            // Reset isSearching after navigation
             setTimeout(() => setIsSearching(false), 100);
         }, 500);
     };
@@ -333,6 +368,7 @@ const PlayersTable = ({ players }: { players: PlayerProps[] }) => {
         <div className="w-full overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:justify-between bg-background-primary items-start sm:items-center p-4 rounded-t-md border-b border-b-foreground/20 gap-4">
                 <h2 className="font-semibold">Seus Jogadores</h2>
+
                 <div className="relative w-full sm:w-auto">
                     <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2" />
                     <input

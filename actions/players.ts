@@ -4,26 +4,35 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
-export async function getPlayersData(page: number = 1, search: string = "") {
+export async function getPlayersData(
+    page: number = 1,
+    search: string = "",
+    agentCode = "",
+) {
     const session = await getSession();
 
     if (!session) {
         redirect("/login");
     }
 
+    const params = new URLSearchParams({
+        page: String(page),
+        ...(search && { search }),
+        ...(agentCode && { agentId: agentCode }),
+    });
+
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/player?page=${page}&search=${encodeURIComponent(
-                search
-            )}`,
+            `https://api.playfivers.com/api/panel/player?${params}`,
             {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
+        console.log(`Bearer ${session.accessToken}`);
 
         if (!data) {
             throw new Error("No valid data received from API");
@@ -44,7 +53,7 @@ export async function getPlayersData(page: number = 1, search: string = "") {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar jogadores")
+                getFriendlyHttpErrorMessage(error, "Falha ao buscar jogadores"),
         );
     }
 }
@@ -78,7 +87,7 @@ export async function updatePlayer(params: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
         // Normalize successful response
         return {
@@ -113,7 +122,7 @@ export async function updatePlayer(params: {
                 apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao atualizar jogador"
+                    "Falha ao atualizar jogador",
                 ),
         } as const;
     }
