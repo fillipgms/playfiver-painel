@@ -26,7 +26,10 @@ const PlayerAgentFilter = forwardRef((props: PlayerAgentFilterProps, ref) => {
 
     const currentAgentsString = searchParams.get("agent") || "";
     const currentAgents = currentAgentsString
-        ? currentAgentsString.split(",")
+        ? currentAgentsString
+              .replace(/[\[\]]/g, "")
+              .split(",")
+              .filter(Boolean)
         : [];
 
     useImperativeHandle(ref, () => {
@@ -42,6 +45,8 @@ const PlayerAgentFilter = forwardRef((props: PlayerAgentFilterProps, ref) => {
         const params = new URLSearchParams(searchParams?.toString() || "");
         params.set("page", "1");
 
+        console.log(currentAgents);
+
         let newAgents: string[];
         if (currentAgents.includes(value)) {
             newAgents = currentAgents.filter((a) => a !== value);
@@ -50,7 +55,7 @@ const PlayerAgentFilter = forwardRef((props: PlayerAgentFilterProps, ref) => {
         }
 
         if (newAgents.length > 0) {
-            params.set("agent", newAgents.join(","));
+            params.set("agent", `[${newAgents.join(",")}]`);
         } else {
             params.delete("agent");
         }
@@ -87,7 +92,7 @@ const PlayerAgentFilter = forwardRef((props: PlayerAgentFilterProps, ref) => {
                                                 : "opacity-50 [&_svg]:invisible",
                                         )}
                                     >
-                                        <CheckIcon className="h-3 w-3" />
+                                        <CheckIcon className="h-3 w-3 text-background" />
                                     </div>
                                     <span>{agent.agentCode}</span>
                                 </CommandItem>
