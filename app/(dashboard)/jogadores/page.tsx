@@ -18,6 +18,7 @@ interface JogadoresPageProps {
     searchParams: Promise<{
         page?: string;
         search?: string;
+        agent?: string;
     }>;
 }
 
@@ -28,8 +29,10 @@ export default async function JogadoresPage({
         const resolvedSearchParams = await searchParams;
         const page = parseInt(resolvedSearchParams.page || "1");
         const search = resolvedSearchParams.search || "";
+        const agentCode = resolvedSearchParams.agent || "";
 
-        const res = await getPlayersData(page, search);
+        const res = await getPlayersData(page, search, agentCode);
+
         const jogadores = res.data;
 
         return (
@@ -104,7 +107,10 @@ export default async function JogadoresPage({
 
                 <section>
                     <Suspense fallback={<div>Carregando tabela...</div>}>
-                        <PlayersTable players={jogadores} />
+                        <PlayersTable
+                            players={jogadores}
+                            agentes={res.agents}
+                        />
                     </Suspense>
                 </section>
 
