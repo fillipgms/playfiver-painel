@@ -15,15 +15,17 @@ export async function getPlayersData(
         redirect("/login");
     }
 
-    const params = new URLSearchParams({
-        page: String(page),
-        ...(search && { search }),
-        ...(agentCode && { agentId: agentCode }),
-    });
+    const params = new URLSearchParams();
+
+    if (page) params.set("page", page.toString());
+    if (search) params.set("search", search);
+    if (agentCode) params.set("agent", agentCode);
+
+    const paramsString = params.toString();
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/player?${params}`,
+            `https://api.playfivers.com/api/panel/player?${paramsString}`,
             {
                 timeout: 5000,
                 headers: {
@@ -32,7 +34,6 @@ export async function getPlayersData(
                 },
             },
         );
-        console.log(`Bearer ${session.accessToken}`);
 
         if (!data) {
             throw new Error("No valid data received from API");
