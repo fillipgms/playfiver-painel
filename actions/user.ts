@@ -4,12 +4,13 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function sendCode(email: string) {
     try {
-        const response = await axios.get(
-            `https://api.playfivers.com/api/auth/login/code`,
-            { params: { email } }
-        );
+        const response = await axios.get(`${BASE_URL}/auth/login/code`, {
+            params: { email },
+        });
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -18,23 +19,23 @@ export async function sendCode(email: string) {
             }
             if (error.response?.status === 429) {
                 throw new Error(
-                    "Muitas tentativas. Por favor, aguarde alguns minutos antes de tentar novamente."
+                    "Muitas tentativas. Por favor, aguarde alguns minutos antes de tentar novamente.",
                 );
             }
             if (error.response?.status === 404) {
                 throw new Error(
-                    "Usuário não encontrado. Verifique se o email está correto."
+                    "Usuário não encontrado. Verifique se o email está correto.",
                 );
             }
             if (error.response?.status === 500) {
                 throw new Error(
-                    "Erro no servidor. Por favor, tente novamente mais tarde."
+                    "Erro no servidor. Por favor, tente novamente mais tarde.",
                 );
             }
             throw new Error(
                 `Erro ao enviar código: ${
                     error.response?.data?.message || error.message
-                }`
+                }`,
             );
         }
         throw new Error("Erro ao enviar código. Por favor, tente novamente.");
@@ -51,19 +52,16 @@ export async function getUser() {
     try {
         const session = JSON.parse(cookie) as SessionPayload;
 
-        const { data } = await axios.get(
-            `https://api.playfivers.com/api/auth/me`,
-            {
-                headers: { Authorization: `Bearer ${session.accessToken}` },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
         return data as User;
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
                 await clearExpiredSession();
                 throw new Error(
-                    "Sessão expirada. Por favor, faça login novamente."
+                    "Sessão expirada. Por favor, faça login novamente.",
                 );
             }
         }
@@ -112,17 +110,16 @@ export async function clearSessionAndRedirect() {
 
 export async function forgotPassword(email: string) {
     try {
-        const response = await axios.post(
-            `https://api.playfivers.com/api/auth/forgot-password`,
-            { email: email }
-        );
+        const response = await axios.post(`${BASE_URL}/auth/forgot-password`, {
+            email: email,
+        });
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
                 await clearExpiredSession();
                 throw new Error(
-                    "Sessão expirada. Por favor, faça login novamente."
+                    "Sessão expirada. Por favor, faça login novamente.",
                 );
             }
         }
@@ -137,25 +134,22 @@ export async function resetPassword(
     email: string,
     password: string,
     password_confirmation: string,
-    code: string
+    code: string,
 ) {
     try {
-        const response = await axios.post(
-            `https://api.playfivers.com/api/auth/reset-password`,
-            {
-                email: email,
-                password: password,
-                password_confirmation: password_confirmation,
-                token: code,
-            }
-        );
+        const response = await axios.post(`${BASE_URL}/auth/reset-password`, {
+            email: email,
+            password: password,
+            password_confirmation: password_confirmation,
+            token: code,
+        });
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
                 await clearExpiredSession();
                 throw new Error(
-                    "Sessão expirada. Por favor, faça login novamente."
+                    "Sessão expirada. Por favor, faça login novamente.",
                 );
             }
         }
@@ -164,7 +158,7 @@ export async function resetPassword(
             if (error.response?.status === 500) {
                 await clearExpiredSession();
                 throw new Error(
-                    "Link inválido. Por favor, solicite um novo link de redefinição de senha."
+                    "Link inválido. Por favor, solicite um novo link de redefinição de senha.",
                 );
             }
         }

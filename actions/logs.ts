@@ -4,11 +4,13 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getLogsData(
     page: number = 1,
     dateStart: string = "",
     dateEnd: string = "",
-    agent: string = ""
+    agent: string = "",
 ) {
     const session = await getSession();
 
@@ -17,7 +19,7 @@ export async function getLogsData(
     }
 
     try {
-        let url = `https://api.playfivers.com/api/panel/logs?page=${page}&agent=${agent}`;
+        let url = `${BASE_URL}/panel/logs?page=${page}&agent=${agent}`;
 
         if (dateStart) {
             const date = new Date(dateStart);
@@ -67,8 +69,8 @@ export async function getLogsData(
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao buscar dados dos logs"
-                )
+                    "Falha ao buscar dados dos logs",
+                ),
         );
     }
 }

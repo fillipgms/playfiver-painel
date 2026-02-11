@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getPlayersData(
     page: number = 1,
     search: string = "",
@@ -25,7 +27,7 @@ export async function getPlayersData(
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/player?${paramsString}`,
+            `${BASE_URL}/panel/player?${paramsString}`,
             {
                 timeout: 5000,
                 headers: {
@@ -79,17 +81,13 @@ export async function updatePlayer(params: {
         if (typeof params.influencer !== "undefined")
             payload.influencer = params.influencer;
 
-        const { data } = await axios.put(
-            `https://api.playfivers.com/api/panel/player`,
-            payload,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
+        const { data } = await axios.put(`${BASE_URL}/panel/player`, payload, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
             },
-        );
+        });
         // Normalize successful response
         return {
             success: true,

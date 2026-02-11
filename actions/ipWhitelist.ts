@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getIpWhitelist(page: number = 1, search: string = "") {
     const session = await getSession();
 
@@ -13,8 +15,8 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/ip?page=${page}&search=${encodeURIComponent(
-                search
+            `${BASE_URL}/panel/ip?page=${page}&search=${encodeURIComponent(
+                search,
             )}`,
             {
                 timeout: 5000,
@@ -22,7 +24,7 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -47,8 +49,8 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao buscar IP whitelist"
-                )
+                    "Falha ao buscar IP whitelist",
+                ),
         );
     }
 }
@@ -61,17 +63,13 @@ export async function createNewIp(payload: { ip: string }) {
     }
 
     try {
-        const { data } = await axios.post(
-            `https://api.playfivers.com/api/panel/ip`,
-            payload,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.post(`${BASE_URL}/panel/ip`, payload, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         if (!data) {
             throw new Error("No valid data received from API");
@@ -110,7 +108,7 @@ export async function createNewIp(payload: { ip: string }) {
         } else {
             errorMessage = getFriendlyHttpErrorMessage(
                 error,
-                "Falha ao criar essa regra de IP"
+                "Falha ao criar essa regra de IP",
             );
         }
 
@@ -129,16 +127,13 @@ export async function deleteIp(id: number) {
     }
 
     try {
-        const { data } = await axios.delete(
-            `https://api.playfivers.com/api/panel/ip/${id}`,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.delete(`${BASE_URL}/panel/ip/${id}`, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         if (!data) {
             throw new Error("No valid data received from API");
@@ -162,8 +157,8 @@ export async function deleteIp(id: number) {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao deletar IP da whitelist"
-                )
+                    "Falha ao deletar IP da whitelist",
+                ),
         );
     }
 }

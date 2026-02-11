@@ -1,10 +1,13 @@
 type User = {
-    balance: string;
     currency: string;
+    data_update: boolean;
+    balance: string;
     email: string;
+    lang: string | null;
     name: string;
     role: string[];
     sum_balance_agents: string;
+    warningsPopUp: string[];
 };
 
 interface SessionPayload {

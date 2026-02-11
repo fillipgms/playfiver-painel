@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getSignatureData() {
     const session = await getSession();
 
@@ -12,16 +14,13 @@ export async function getSignatureData() {
     }
 
     try {
-        const { data } = await axios.get(
-            "https://api.playfivers.com/api/panel/signature",
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/panel/signature`, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         if (!data) {
             throw new Error("No valid data received from API");
@@ -45,8 +44,8 @@ export async function getSignatureData() {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao buscar dados da home"
-                )
+                    "Falha ao buscar dados da home",
+                ),
         );
     }
 }
@@ -75,7 +74,7 @@ export async function createInfluencerOrder(payload: {
 
     try {
         const { data } = await axios.post(
-            "https://api.playfivers.com/api/panel/signature",
+            `${BASE_URL}/panel/signature`,
             processedPayload,
             {
                 timeout: 10000,
@@ -83,7 +82,7 @@ export async function createInfluencerOrder(payload: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -100,8 +99,8 @@ export async function createInfluencerOrder(payload: {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao criar pedido de influencer"
-                )
+                    "Falha ao criar pedido de influencer",
+                ),
         );
     }
 }
@@ -114,16 +113,13 @@ export async function getInfluencerOrderStatus(id: string | number) {
     }
 
     try {
-        const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/order?id=${id}`,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/panel/order?id=${id}`, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         return data;
     } catch (error) {

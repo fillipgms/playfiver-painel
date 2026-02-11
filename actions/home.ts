@@ -5,23 +5,22 @@ import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const fetchHomeDataCached = unstable_cache(
     async (accessToken: string) => {
-        const { data } = await axios.get(
-            "https://api.playfivers.com/api/panel/home",
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/panel/home`, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
         if (!data) throw new Error("No valid data received from API");
         return data;
     },
     ["home-data"],
-    { revalidate: 60 }
+    { revalidate: 60 },
 );
 
 export async function getHomeData() {
@@ -51,8 +50,8 @@ export async function getHomeData() {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     err,
-                    "Falha ao buscar dados da home"
-                )
+                    "Falha ao buscar dados da home",
+                ),
         );
     }
 }

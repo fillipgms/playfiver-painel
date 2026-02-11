@@ -5,27 +5,29 @@ import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 import { unstable_cache } from "next/cache";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const fetchGamesCached = unstable_cache(
     async (accessToken: string, queryString: string) => {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/games?${queryString}`,
+            `${BASE_URL}/panel/games?${queryString}`,
             {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${accessToken}`,
                 },
-            }
+            },
         );
         if (!data) throw new Error("No valid data received from API");
         return data as GamesResponse;
     },
     ["games-data"],
-    { revalidate: 120 }
+    { revalidate: 120 },
 );
 
 export async function getGamesData(
-    filters: GamesFilters = {}
+    filters: GamesFilters = {},
 ): Promise<GamesResponse | null> {
     const session = await getSession();
 
@@ -66,7 +68,7 @@ export async function getGamesData(
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar jogos")
+                getFriendlyHttpErrorMessage(error, "Falha ao buscar jogos"),
         );
     }
 }
