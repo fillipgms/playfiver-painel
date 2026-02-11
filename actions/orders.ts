@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getOrdersData(page: number = 1) {
     const session = await getSession();
 
@@ -13,14 +15,14 @@ export async function getOrdersData(page: number = 1) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/orders?page=${page}`,
+            `${BASE_URL}/panel/orders?page=${page}`,
             {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -45,8 +47,8 @@ export async function getOrdersData(page: number = 1) {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao buscar dados do seu consumo"
-                )
+                    "Falha ao buscar dados do seu consumo",
+                ),
         );
     }
 }
@@ -74,7 +76,7 @@ export async function createOrder(payload: {
 
     try {
         const { data } = await axios.post(
-            "https://api.playfivers.com/api/panel/order",
+            `${BASE_URL}/panel/order`,
             processedPayload,
             {
                 timeout: 10000,
@@ -82,7 +84,7 @@ export async function createOrder(payload: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -105,7 +107,7 @@ export async function createOrder(payload: {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao criar pedido")
+                getFriendlyHttpErrorMessage(error, "Falha ao criar pedido"),
         );
     }
 }
@@ -118,16 +120,13 @@ export async function getOrderStatus(id: string | number) {
     }
 
     try {
-        const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/order?id=${id}`,
-            {
-                timeout: 5000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/panel/order?id=${id}`, {
+            timeout: 5000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         return data;
     } catch (error) {

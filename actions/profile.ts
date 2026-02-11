@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function updateProfile(name: string, email: string) {
     const session = await getSession();
 
@@ -13,7 +15,7 @@ export async function updateProfile(name: string, email: string) {
 
     try {
         const { data } = await axios.put(
-            `https://api.playfivers.com/api/panel/profile`,
+            `${BASE_URL}/panel/profile`,
             { name: name, email: email },
             {
                 timeout: 5000,
@@ -21,7 +23,7 @@ export async function updateProfile(name: string, email: string) {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
         if (!data) {
             throw new Error("No valid data received from API");
@@ -41,7 +43,7 @@ export async function updateProfile(name: string, email: string) {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao atualizar perfil")
+                getFriendlyHttpErrorMessage(error, "Falha ao atualizar perfil"),
         );
     }
 }

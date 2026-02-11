@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getTransactionsData(
     page: number = 1,
     search: string = "",
     dateStart: string = "",
     dateEnd: string = "",
-    agent: string = ""
+    agent: string = "",
 ) {
     const session = await getSession();
 
@@ -18,8 +20,8 @@ export async function getTransactionsData(
     }
 
     try {
-        let url = `https://api.playfivers.com/api/panel/transactions?page=${page}&search=${encodeURIComponent(
-            search
+        let url = `${BASE_URL}/panel/transactions?page=${page}&search=${encodeURIComponent(
+            search,
         )}&agent=${encodeURIComponent(agent)}`;
 
         if (dateStart) {
@@ -67,7 +69,10 @@ export async function getTransactionsData(
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar transações")
+                getFriendlyHttpErrorMessage(
+                    error,
+                    "Falha ao buscar transações",
+                ),
         );
     }
 }

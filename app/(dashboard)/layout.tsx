@@ -10,6 +10,7 @@ import {
     useSidebarMobileTourStep,
 } from "@/data/toursteps";
 import TourCard from "@/components/TourCard";
+import UpdateInfoModal from "@/components/UpdateInfoModal";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,7 +28,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 isOpen={isSidebarOpen || isSidebarMobileStep}
                 onClose={closeSidebar}
             />
-            <div id="home-component" className="flex-1 flex flex-col min-h-svh">
+            <div
+                id="home-component"
+                vaul-drawer-wrapper=""
+                className="flex-1 flex flex-col min-h-svh"
+            >
+                <UpdateInfoModal />
                 <Header onMenuToggle={toggleSidebar} />
                 <div
                     id="home-screen"

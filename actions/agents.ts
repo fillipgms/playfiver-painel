@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getAgentsData({
     page = 1,
     search = "",
@@ -19,8 +21,8 @@ export async function getAgentsData({
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/agentes?page=${page}&search=${encodeURIComponent(
-                search
+            `${BASE_URL}/panel/agentes?page=${page}&search=${encodeURIComponent(
+                search,
             )}`,
             {
                 timeout: 5000,
@@ -28,7 +30,7 @@ export async function getAgentsData({
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -51,7 +53,7 @@ export async function getAgentsData({
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar agentes")
+                getFriendlyHttpErrorMessage(error, "Falha ao buscar agentes"),
         );
     }
 }
@@ -79,7 +81,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
 
     try {
         const { data } = await axios.post(
-            "https://api.playfivers.com/api/panel/agentes",
+            `${BASE_URL}/panel/agentes`,
             {
                 agent_memo: payload.agent_memo,
                 agent_code: payload.agent_code,
@@ -95,7 +97,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -140,7 +142,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
             } else {
                 errorMessage = getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao criar agente"
+                    "Falha ao criar agente",
                 );
             }
 
@@ -154,7 +156,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
 
 export async function updateAgent(
     agentId: number,
-    payload: CreateOrUpdateAgentPayload
+    payload: CreateOrUpdateAgentPayload,
 ) {
     const session = await getSession();
 
@@ -164,7 +166,7 @@ export async function updateAgent(
 
     try {
         const { data } = await axios.put(
-            `https://api.playfivers.com/api/panel/agentes/`,
+            `${BASE_URL}/panel/agentes/`,
             {
                 id_agente: agentId,
                 agent_memo: payload.agent_memo,
@@ -185,7 +187,7 @@ export async function updateAgent(
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -229,7 +231,7 @@ export async function updateAgent(
         } else {
             errorMessage = getFriendlyHttpErrorMessage(
                 error,
-                "Falha ao atualizar agente"
+                "Falha ao atualizar agente",
             );
         }
 
@@ -249,14 +251,14 @@ export async function deleteAgent(agentId: number) {
 
     try {
         const { data } = await axios.delete(
-            `https://api.playfivers.com/api/panel/agentes/${agentId}`,
+            `${BASE_URL}/panel/agentes/${agentId}`,
             {
                 timeout: 5000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         return data;
@@ -275,7 +277,7 @@ export async function deleteAgent(agentId: number) {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao excluir agente")
+                getFriendlyHttpErrorMessage(error, "Falha ao excluir agente"),
         );
     }
 }

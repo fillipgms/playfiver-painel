@@ -10,6 +10,8 @@ import axios from "axios";
 import { createSession, deleteSession } from "./session";
 import { getSession } from "@/actions/user";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function requestVerificationCode(formData: FormData) {
     const validationResult = codeEmailSchema.safeParse({
         name: formData.get("name"),
@@ -29,7 +31,7 @@ export async function requestVerificationCode(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.playfivers.com/api/auth/code-email-register",
+            url: `${BASE_URL}/auth/code-email-register`,
             data: { name, email },
         });
 
@@ -97,7 +99,7 @@ export async function register(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.playfivers.com/api/auth/register",
+            url: `${BASE_URL}/auth/register`,
             data: { name, email, password, verification_code },
         });
 
@@ -164,7 +166,7 @@ export async function signIn(formData: FormData) {
     try {
         const response = await axios({
             method: "post",
-            url: "https://api.playfivers.com/api/auth/login",
+            url: `${BASE_URL}/auth/login`,
             data: { email, password },
         });
 
@@ -223,14 +225,14 @@ export async function logout(): Promise<{
         }
 
         const response = await axios.post(
-            "https://api.playfivers.com/api/auth/logout",
+            `${BASE_URL}/auth/logout`,
             {},
             {
                 headers: {
                     Authorization: `Bearer ${session.accessToken}`,
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
 
         if (response.status === 200) {

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "./user";
 import { getFriendlyHttpErrorMessage } from "@/lib/httpError";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export async function getWalletsData(page: number = 1) {
     const session = await getSession();
 
@@ -13,14 +15,14 @@ export async function getWalletsData(page: number = 1) {
 
     try {
         const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/wallet?page=${page}`,
+            `${BASE_URL}/panel/wallet?page=${page}`,
             {
                 timeout: 10000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-            }
+            },
         );
 
         if (!data) {
@@ -42,7 +44,7 @@ export async function getWalletsData(page: number = 1) {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar carteiras")
+                getFriendlyHttpErrorMessage(error, "Falha ao buscar carteiras"),
         );
     }
 }
@@ -61,14 +63,14 @@ export async function getAllWalletsData() {
 
         while (hasMore) {
             const { data } = await axios.get(
-                `https://api.playfivers.com/api/panel/wallet?page=${currentPage}`,
+                `${BASE_URL}/panel/wallet?page=${currentPage}`,
                 {
                     timeout: 10000,
                     headers: {
                         Accept: "application/json",
                         Authorization: `Bearer ${session.accessToken}`,
                     },
-                }
+                },
             );
 
             if (!data || !data.data) {
@@ -107,8 +109,8 @@ export async function getAllWalletsData() {
             apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
-                    "Falha ao buscar todas as carteiras"
-                )
+                    "Falha ao buscar todas as carteiras",
+                ),
         );
     }
 }
@@ -121,16 +123,13 @@ export async function getWalletGGr(id: number) {
     }
 
     try {
-        const { data } = await axios.get(
-            `https://api.playfivers.com/api/panel/ggr?type=${id}`,
-            {
-                timeout: 10000,
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${session.accessToken}`,
-                },
-            }
-        );
+        const { data } = await axios.get(`${BASE_URL}/panel/ggr?type=${id}`, {
+            timeout: 10000,
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
+            },
+        });
 
         if (!data) {
             throw new Error("No valid data received from API");
@@ -152,7 +151,7 @@ export async function getWalletGGr(id: number) {
 
         throw new Error(
             apiMessage ||
-                getFriendlyHttpErrorMessage(error, "Falha ao buscar GGR")
+                getFriendlyHttpErrorMessage(error, "Falha ao buscar GGR"),
         );
     }
 }
