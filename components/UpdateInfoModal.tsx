@@ -75,17 +75,11 @@ const UpdateInfoModal = () => {
 
         const shouldOpenModal = user.data_update === true || !user.lang;
 
-        console.log("need update", user.data_update);
-        console.log("user hand lag", !!user.lang);
-
         if (shouldOpenModal) {
             const hasVisited = localStorage.getItem("playfiver-first-visit");
             const tourCompleted = localStorage.getItem(
                 "playfiver-tour-completed",
             );
-
-            console.log("has visited", hasVisited);
-            console.log("is tour completed", tourCompleted);
 
             if (!hasVisited && !tourCompleted) {
                 const handleTourComplete = () => {
