@@ -398,13 +398,15 @@ export const steps: Tour[] = [
 ];
 
 export const useFirstVisitTour = () => {
-    const { startNextStep } = useNextStep();
+    const { startNextStep, currentStep } = useNextStep();
+    const [tourStarted, setTourStarted] = useState(false);
 
     useEffect(() => {
         const hasVisited = localStorage.getItem("playfiver-first-visit");
 
         if (!hasVisited) {
             localStorage.setItem("playfiver-first-visit", "true");
+            setTourStarted(true);
 
             const timer = setTimeout(() => {
                 startNextStep("mainTour");
@@ -413,6 +415,15 @@ export const useFirstVisitTour = () => {
             return () => clearTimeout(timer);
         }
     }, [startNextStep]);
+
+    // Detect when tour completes (last step is index 20)
+    useEffect(() => {
+        if (tourStarted && currentStep === null) {
+            // Tour has completed, emit custom event
+            localStorage.setItem("playfiver-tour-completed", "true");
+            window.dispatchEvent(new CustomEvent("tourCompleted"));
+        }
+    }, [currentStep, tourStarted]);
 };
 
 export const useGameTourStep = () => {

@@ -40,12 +40,19 @@ interface Language {
     value: string;
 }
 
+interface CountryCode {
+    cca2: string;
+    callingCode: string;
+    name_pt: string;
+}
+
 const UpdateInfoModal = () => {
     const [open, setOpen] = useState(false);
     const [countries, setCountries] = useState<Country[]>([]);
     const [languages, setLanguages] = useState<Language[]>([]);
+    const [countryCodes, setCountryCodes] = useState<CountryCode[]>([]);
     const [selectedNationality, setSelectedNationality] = useState("");
-    const [selectedCountry, setSelectedCountry] = useState("");
+    const [selectedCountryCode, setSelectedCountryCode] = useState("");
     const [selectedLang, setSelectedLang] = useState("");
     const [phone, setPhone] = useState("");
     const [document, setDocument] = useState("");
@@ -58,8 +65,36 @@ const UpdateInfoModal = () => {
     useEffect(() => {
         if (!user) return;
 
-        if (user.data_update === true || !user.lang) {
-            setOpen(true);
+        const shouldOpenModal = user.data_update === true || !user.lang;
+
+        console.log("need update", user.data_update);
+        console.log("user hand lag", !!user.lang);
+
+        if (shouldOpenModal) {
+            const hasVisited = localStorage.getItem("playfiver-first-visit");
+            const tourCompleted = localStorage.getItem(
+                "playfiver-tour-completed",
+            );
+
+            console.log("has visited", hasVisited);
+            console.log("is tour completed", tourCompleted);
+
+            if (!hasVisited && !tourCompleted) {
+                const handleTourComplete = () => {
+                    setOpen(true);
+                };
+
+                window.addEventListener("tourCompleted", handleTourComplete);
+
+                return () => {
+                    window.removeEventListener(
+                        "tourCompleted",
+                        handleTourComplete,
+                    );
+                };
+            } else {
+                setOpen(true);
+            }
         }
 
         const getRegisterOptions = async () => {
@@ -67,6 +102,37 @@ const UpdateInfoModal = () => {
                 const res = await registerOptions();
                 setCountries(res.countries || []);
                 setLanguages(res.languages || []);
+
+                const codesRes = await fetch(
+                    "https://restcountries.com/v3.1/all?fields=cca2,idd",
+                );
+                const codesData = await codesRes.json();
+
+                const processedCodes: CountryCode[] = codesData
+                    .map((item: any) => {
+                        const root = item.idd?.root || "";
+                        const suffixes = item.idd?.suffixes || [];
+
+                        if (!root || suffixes.length === 0) return null;
+
+                        const callingCode = root + suffixes[0];
+
+                        const country = res.countries?.find(
+                            (c: Country) => c.iso2 === item.cca2,
+                        );
+
+                        return {
+                            cca2: item.cca2,
+                            callingCode,
+                            name_pt: country?.name_pt || item.cca2,
+                        };
+                    })
+                    .filter(Boolean)
+                    .sort((a: CountryCode, b: CountryCode) =>
+                        a.name_pt.localeCompare(b.name_pt),
+                    );
+
+                setCountryCodes(processedCodes);
             } catch (err) {
                 console.error(err);
                 setError("Falha ao carregar opções");
@@ -75,6 +141,55 @@ const UpdateInfoModal = () => {
 
         getRegisterOptions();
     }, [user]);
+
+    useEffect(() => {
+        if (selectedNationality && countryCodes.length > 0) {
+            const nationalityCountry = countries.find(
+                (c) => c.name_en === selectedNationality,
+            );
+            if (nationalityCountry) {
+                const matchingCode = countryCodes.find(
+                    (cc) => cc.cca2 === nationalityCountry.iso2,
+                );
+                if (matchingCode && !selectedCountryCode) {
+                    setSelectedCountryCode(matchingCode.cca2);
+                }
+            }
+        }
+    }, [selectedNationality, countryCodes, countries, selectedCountryCode]);
+
+    const formatCPF = (value: string) => {
+        const numbers = value.replace(/\D/g, "");
+        if (numbers.length <= 3) return numbers;
+        if (numbers.length <= 6)
+            return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+        if (numbers.length <= 9)
+            return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+        return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    };
+
+    const formatPhone = (value: string) => {
+        const numbers = value.replace(/\D/g, "");
+        if (selectedCountryCode === "BR") {
+            if (numbers.length <= 2) return numbers;
+            if (numbers.length <= 6)
+                return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+            if (numbers.length <= 10)
+                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+            return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+        }
+        return numbers;
+    };
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhone(e.target.value);
+        setPhone(formatted);
+    };
+
+    const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatCPF(e.target.value);
+        setDocument(formatted);
+    };
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -85,8 +200,10 @@ const UpdateInfoModal = () => {
         try {
             const errors: Record<string, string> = {};
 
-            if (!selectedNationality) errors.nationality = "Nacionalidade é obrigatória";
-            if (!selectedCountry) errors.country = "País é obrigatório";
+            if (!selectedNationality)
+                errors.nationality = "Nacionalidade é obrigatória";
+            if (!selectedCountryCode)
+                errors.countryCode = "Código do país é obrigatório";
             if (!phone) errors.phone = "Telefone é obrigatório";
             if (!selectedLang) errors.lang = "Idioma é obrigatório";
             if (selectedNationality === "Brazil" && !document) {
@@ -101,10 +218,10 @@ const UpdateInfoModal = () => {
 
             await updateUserData({
                 nationality: selectedNationality,
-                country: selectedCountry,
-                phone,
+                country: selectedCountryCode,
+                phone: phone.replace(/\D/g, ""), // Send only numbers
                 lang: selectedLang.toUpperCase(),
-                ...(document && { document }),
+                ...(document && { document: document.replace(/\D/g, "") }), // Send only numbers
             });
 
             await refreshSession();
@@ -113,7 +230,7 @@ const UpdateInfoModal = () => {
             setError(
                 err instanceof Error
                     ? err.message
-                    : "Ocorreu um erro ao atualizar informações"
+                    : "Ocorreu um erro ao atualizar informações",
             );
         } finally {
             setIsSubmitting(false);
@@ -175,57 +292,70 @@ const UpdateInfoModal = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground">
-                                    País *
-                                </label>
-                                <Select
-                                    value={selectedCountry}
-                                    onValueChange={setSelectedCountry}
-                                    disabled={isSubmitting}
-                                >
-                                    <SelectTrigger className="w-full h-10 border-foreground/20 bg-background-secondary">
-                                        <div className="flex items-center gap-2">
-                                            <GlobeIcon className="w-4 h-4 text-foreground/40" />
-                                            <SelectValue placeholder="Selecione seu país" />
-                                        </div>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {countries.map((country) => (
-                                            <SelectItem
-                                                key={country.iso2}
-                                                value={country.iso2}
-                                            >
-                                                {country.name_pt}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {fieldErrors.country && (
-                                    <p className="text-xs text-red-500">
-                                        {fieldErrors.country}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
                                 <label
                                     className="text-sm font-medium text-foreground"
                                     htmlFor="phone"
                                 >
                                     Telefone *
                                 </label>
-                                <div className="relative">
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
+                                <div className="flex gap-2">
+                                    <Select
+                                        value={selectedCountryCode}
+                                        onValueChange={setSelectedCountryCode}
                                         disabled={isSubmitting}
-                                        placeholder="Sem código do país"
-                                        className="w-full h-10 px-3 pl-10 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    />
-                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                                    >
+                                        <SelectTrigger className="w-[180px] h-10 border-foreground/20 bg-background-secondary">
+                                            <SelectValue placeholder="+00">
+                                                {selectedCountryCode &&
+                                                    countryCodes.find(
+                                                        (c) =>
+                                                            c.cca2 ===
+                                                            selectedCountryCode,
+                                                    )?.callingCode}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {countryCodes.map((country) => (
+                                                <SelectItem
+                                                    key={country.cca2}
+                                                    value={country.cca2}
+                                                >
+                                                    <div className="flex items-center justify-between w-full gap-3">
+                                                        <span className="font-medium">
+                                                            {
+                                                                country.callingCode
+                                                            }
+                                                        </span>
+                                                        <span className="text-foreground/60 text-xs">
+                                                            {country.name_pt}
+                                                        </span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <div className="relative flex-1">
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value={phone}
+                                            onChange={handlePhoneChange}
+                                            disabled={isSubmitting}
+                                            placeholder={
+                                                selectedCountryCode === "BR"
+                                                    ? "(00) 00000-0000"
+                                                    : "Número sem código do país"
+                                            }
+                                            className="w-full h-10 px-3 pl-10 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        />
+                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                                    </div>
                                 </div>
+                                {fieldErrors.countryCode && (
+                                    <p className="text-xs text-red-500">
+                                        {fieldErrors.countryCode}
+                                    </p>
+                                )}
                                 {fieldErrors.phone && (
                                     <p className="text-xs text-red-500">
                                         {fieldErrors.phone}
@@ -279,9 +409,10 @@ const UpdateInfoModal = () => {
                                             type="text"
                                             id="document"
                                             value={document}
-                                            onChange={(e) => setDocument(e.target.value)}
+                                            onChange={handleCPFChange}
                                             disabled={isSubmitting}
                                             placeholder="000.000.000-00"
+                                            maxLength={14}
                                             className="w-full h-10 px-3 pl-10 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         />
                                         <IdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
