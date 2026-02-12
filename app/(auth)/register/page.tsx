@@ -8,15 +8,51 @@ import {
 import { requestVerificationCode, register, signIn } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { registerOptions } from "@/actions/meta";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
+interface Country {
+    iso2: string;
+    name_en: string;
+    name_pt: string;
+    value: string;
+}
+
+interface Language {
+    code: string;
+    name_en: string;
+    name_pt: string;
+    value: string;
+}
+
+interface CountryCode {
+    cca2: string;
+    callingCode: string;
+    name_pt: string;
+}
+
+interface RestCountryIDD {
+    cca2: string;
+    idd: {
+        root: string;
+        suffixes: string[];
+    };
+}
 
 export default function RegisterPage() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
-        {}
+        {},
     );
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,6 +64,14 @@ export default function RegisterPage() {
         confirmPassword: "",
     });
     const [verificationCode, setVerificationCode] = useState("");
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [languages, setLanguages] = useState<Language[]>([]);
+    const [countryCodes, setCountryCodes] = useState<CountryCode[]>([]);
+    const [selectedNationality, setSelectedNationality] = useState("");
+    const [selectedCountryCode, setSelectedCountryCode] = useState("");
+    const [selectedLang, setSelectedLang] = useState("");
+    const [phone, setPhone] = useState("");
+    const [document, setDocument] = useState("");
 
     const onRequestCode = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -67,6 +111,11 @@ export default function RegisterPage() {
         formDataObj.append("password", formData.password);
         formDataObj.append("confirmPassword", formData.confirmPassword);
         formDataObj.append("verification_code", verificationCode);
+        formDataObj.append("nationality", selectedNationality);
+        formDataObj.append("country", selectedCountryCode);
+        formDataObj.append("lang", selectedLang);
+        formDataObj.append("phone", phone);
+        formDataObj.append("document", document);
 
         const result = await register(formDataObj);
 
@@ -88,6 +137,101 @@ export default function RegisterPage() {
         }
     };
 
+    useEffect(() => {
+        const getRegisterOptions = async () => {
+            try {
+                const res = await registerOptions();
+                setCountries(res.countries || []);
+                setLanguages(res.languages || []);
+
+                const codesRes = await fetch(
+                    "https://restcountries.com/v3.1/all?fields=cca2,idd",
+                );
+                const codesData = await codesRes.json();
+
+                const processedCodes: CountryCode[] = codesData
+                    .map((item: RestCountryIDD) => {
+                        const root = item.idd?.root || "";
+                        const suffixes = item.idd?.suffixes || [];
+
+                        if (!root || suffixes.length === 0) return null;
+
+                        const callingCode = root + suffixes[0];
+
+                        const country = res.countries?.find(
+                            (c: Country) => c.iso2 === item.cca2,
+                        );
+
+                        return {
+                            cca2: item.cca2,
+                            callingCode,
+                            name_pt: country?.name_pt || item.cca2,
+                        };
+                    })
+                    .filter(Boolean)
+                    .sort((a: CountryCode, b: CountryCode) =>
+                        a.name_pt.localeCompare(b.name_pt),
+                    );
+
+                setCountryCodes(processedCodes);
+            } catch (err) {
+                console.error(err);
+                setError("Falha ao carregar opções");
+            }
+        };
+
+        getRegisterOptions();
+    }, []);
+
+    useEffect(() => {
+        if (selectedNationality && countryCodes.length > 0) {
+            const nationalityCountry = countries.find(
+                (c) => c.name_en === selectedNationality,
+            );
+            if (nationalityCountry) {
+                const matchingCode = countryCodes.find(
+                    (cc) => cc.cca2 === nationalityCountry.iso2,
+                );
+                if (matchingCode && !selectedCountryCode) {
+                    setSelectedCountryCode(matchingCode.cca2);
+                }
+            }
+        }
+    }, [selectedNationality, countryCodes, countries, selectedCountryCode]);
+
+    const formatCPF = (value: string) => {
+        const numbers = value.replace(/\D/g, "");
+        if (numbers.length <= 3) return numbers;
+        if (numbers.length <= 6)
+            return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+        if (numbers.length <= 9)
+            return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+        return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    };
+
+    const formatPhone = (value: string) => {
+        const numbers = value.replace(/\D/g, "");
+        if (selectedCountryCode === "BR") {
+            if (numbers.length <= 2) return numbers;
+            if (numbers.length <= 6)
+                return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+            if (numbers.length <= 10)
+                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+            return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+        }
+        return numbers;
+    };
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhone(e.target.value);
+        setPhone(formatted);
+    };
+
+    const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatCPF(e.target.value);
+        setDocument(formatted);
+    };
+
     const goBackToForm = () => {
         setStep("form");
         setError(null);
@@ -95,6 +239,8 @@ export default function RegisterPage() {
         setFieldErrors({});
         setVerificationCode("");
     };
+
+    const isBrazilian = selectedNationality === "Brazil";
 
     if (step === "verification") {
         return (
@@ -221,6 +367,164 @@ export default function RegisterPage() {
                                 )}
                             </div>
 
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-foreground">
+                                    Nacionalidade *
+                                </label>
+                                <Select
+                                    value={selectedNationality}
+                                    onValueChange={setSelectedNationality}
+                                >
+                                    <SelectTrigger className="w-full h-10 border-foreground/20 bg-background-secondary">
+                                        <div className="flex items-center gap-2">
+                                            <SelectValue placeholder="Selecione sua nacionalidade" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {countries.map((country) => (
+                                            <SelectItem
+                                                key={country.iso2}
+                                                value={country.name_en}
+                                            >
+                                                {country.name_pt}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {fieldErrors.nationality && (
+                                    <p className="text-xs text-red-500">
+                                        {fieldErrors.nationality}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label
+                                    className="text-sm font-medium text-foreground"
+                                    htmlFor="phone"
+                                >
+                                    Telefone *
+                                </label>
+                                <div className="grid grid-cols-[1fr_3fr] gap-2">
+                                    <Select
+                                        value={selectedCountryCode}
+                                        onValueChange={setSelectedCountryCode}
+                                    >
+                                        <SelectTrigger className="h-10 border-foreground/20 bg-background-secondary">
+                                            <SelectValue placeholder="+00">
+                                                {selectedCountryCode &&
+                                                    countryCodes.find(
+                                                        (c) =>
+                                                            c.cca2 ===
+                                                            selectedCountryCode,
+                                                    )?.callingCode}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {countryCodes.map((country) => (
+                                                <SelectItem
+                                                    key={country.cca2}
+                                                    value={country.cca2}
+                                                >
+                                                    <div className="flex items-center justify-between w-full gap-3">
+                                                        <span className="font-medium">
+                                                            {
+                                                                country.callingCode
+                                                            }
+                                                        </span>
+                                                        <span className="text-foreground/60 text-xs">
+                                                            {country.name_pt}
+                                                        </span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <div className="relative flex-1">
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value={phone}
+                                            onChange={handlePhoneChange}
+                                            placeholder={
+                                                selectedCountryCode === "BR"
+                                                    ? "(00) 00000-0000"
+                                                    : "Número sem código do país"
+                                            }
+                                            className="w-full h-10 px-3 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        />
+                                    </div>
+                                </div>
+                                {fieldErrors.countryCode && (
+                                    <p className="text-xs text-red-500">
+                                        {fieldErrors.countryCode}
+                                    </p>
+                                )}
+                                {fieldErrors.phone && (
+                                    <p className="text-xs text-red-500">
+                                        {fieldErrors.phone}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-foreground">
+                                    Idioma *
+                                </label>
+                                <Select
+                                    value={selectedLang}
+                                    onValueChange={setSelectedLang}
+                                >
+                                    <SelectTrigger className="w-full h-10 border-foreground/20 bg-background-secondary">
+                                        <div className="flex items-center gap-2">
+                                            <SelectValue placeholder="Selecione seu idioma" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {languages.map((language) => (
+                                            <SelectItem
+                                                key={language.code}
+                                                value={language.code}
+                                            >
+                                                {language.name_pt}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {fieldErrors.lang && (
+                                    <p className="text-xs text-red-500">
+                                        {fieldErrors.lang}
+                                    </p>
+                                )}
+                            </div>
+
+                            {isBrazilian && (
+                                <div className="space-y-2">
+                                    <label
+                                        className="text-sm font-medium text-foreground"
+                                        htmlFor="document"
+                                    >
+                                        CPF *
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            id="document"
+                                            value={document}
+                                            onChange={handleCPFChange}
+                                            placeholder="000.000.000-00"
+                                            maxLength={14}
+                                            className="w-full h-10 px-3 pl-10 border border-foreground/20 rounded-lg bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        />
+                                    </div>
+                                    {fieldErrors.document && (
+                                        <p className="text-xs text-red-500">
+                                            {fieldErrors.document}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1">
                                     <label
@@ -295,7 +599,7 @@ export default function RegisterPage() {
                                             }
                                             onClick={() =>
                                                 setShowConfirmPassword(
-                                                    (v) => !v
+                                                    (v) => !v,
                                                 )
                                             }
                                             className="absolute inset-y-0 right-2 flex items-center text-foreground/70 hover:text-foreground"
