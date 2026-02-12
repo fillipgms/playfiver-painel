@@ -46,6 +46,14 @@ interface CountryCode {
     name_pt: string;
 }
 
+interface RestCountryIDD {
+    cca2: string;
+    idd: {
+        root: string;
+        suffixes: string[];
+    };
+}
+
 const UpdateInfoModal = () => {
     const [open, setOpen] = useState(false);
     const [countries, setCountries] = useState<Country[]>([]);
@@ -109,7 +117,7 @@ const UpdateInfoModal = () => {
                 const codesData = await codesRes.json();
 
                 const processedCodes: CountryCode[] = codesData
-                    .map((item: any) => {
+                    .map((item: RestCountryIDD) => {
                         const root = item.idd?.root || "";
                         const suffixes = item.idd?.suffixes || [];
 
