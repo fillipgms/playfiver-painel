@@ -29,7 +29,7 @@ export async function getPlayersData(
         const { data } = await axios.get(
             `${BASE_URL}/panel/player?${paramsString}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -82,7 +82,7 @@ export async function updatePlayer(params: {
             payload.influencer = params.influencer;
 
         const { data } = await axios.put(`${BASE_URL}/panel/player`, payload, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,

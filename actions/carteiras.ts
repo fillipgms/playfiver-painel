@@ -17,7 +17,7 @@ export async function getWalletsData(page: number = 1) {
         const { data } = await axios.get(
             `${BASE_URL}/panel/wallet?page=${page}`,
             {
-                timeout: 10000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -65,7 +65,7 @@ export async function getAllWalletsData() {
             const { data } = await axios.get(
                 `${BASE_URL}/panel/wallet?page=${currentPage}`,
                 {
-                    timeout: 10000,
+                    timeout: 30000,
                     headers: {
                         Accept: "application/json",
                         Authorization: `Bearer ${session.accessToken}`,
@@ -124,7 +124,7 @@ export async function getWalletGGr(id: number) {
 
     try {
         const { data } = await axios.get(`${BASE_URL}/panel/ggr?type=${id}`, {
-            timeout: 10000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,

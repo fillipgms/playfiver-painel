@@ -66,7 +66,7 @@ export async function updateUserData({
                 ...(document && { document }),
             },
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,

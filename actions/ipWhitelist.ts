@@ -19,7 +19,7 @@ export async function getIpWhitelist(page: number = 1, search: string = "") {
                 search,
             )}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -64,7 +64,7 @@ export async function createNewIp(payload: { ip: string }) {
 
     try {
         const { data } = await axios.post(`${BASE_URL}/panel/ip`, payload, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,
@@ -128,7 +128,7 @@ export async function deleteIp(id: number) {
 
     try {
         const { data } = await axios.delete(`${BASE_URL}/panel/ip/${id}`, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,

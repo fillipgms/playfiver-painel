@@ -15,7 +15,7 @@ export async function getSignatureData() {
 
     try {
         const { data } = await axios.get(`${BASE_URL}/panel/signature`, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,
@@ -77,7 +77,7 @@ export async function createInfluencerOrder(payload: {
             `${BASE_URL}/panel/signature`,
             processedPayload,
             {
-                timeout: 10000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -114,7 +114,7 @@ export async function getInfluencerOrderStatus(id: string | number) {
 
     try {
         const { data } = await axios.get(`${BASE_URL}/panel/order?id=${id}`, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,
