@@ -17,7 +17,7 @@ export async function getOrdersData(page: number = 1) {
         const { data } = await axios.get(
             `${BASE_URL}/panel/orders?page=${page}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -79,7 +79,7 @@ export async function createOrder(payload: {
             `${BASE_URL}/panel/order`,
             processedPayload,
             {
-                timeout: 10000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -121,7 +121,7 @@ export async function getOrderStatus(id: string | number) {
 
     try {
         const { data } = await axios.get(`${BASE_URL}/panel/order?id=${id}`, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,

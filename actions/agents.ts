@@ -25,7 +25,7 @@ export async function getAgentsData({
                 search,
             )}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -92,7 +92,7 @@ export async function createAgent(payload: CreateOrUpdateAgentPayload) {
                 bonus_enable: payload.bonus_enable === true ? 1 : 0,
             },
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -182,7 +182,7 @@ export async function updateAgent(
                 limit_hours: payload.limit_hours,
             },
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,
@@ -253,7 +253,7 @@ export async function deleteAgent(agentId: number) {
         const { data } = await axios.delete(
             `${BASE_URL}/panel/agentes/${agentId}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,

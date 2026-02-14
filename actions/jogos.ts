@@ -12,7 +12,7 @@ const fetchGamesCached = unstable_cache(
         const { data } = await axios.get(
             `${BASE_URL}/panel/games?${queryString}`,
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${accessToken}`,

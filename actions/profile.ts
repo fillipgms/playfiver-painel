@@ -18,7 +18,7 @@ export async function updateProfile(name: string, email: string) {
             `${BASE_URL}/panel/profile`,
             { name: name, email: email },
             {
-                timeout: 5000,
+                timeout: 30000,
                 headers: {
                     Accept: "application/json",
                     Authorization: `Bearer ${session.accessToken}`,

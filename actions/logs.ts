@@ -40,7 +40,7 @@ export async function getLogsData(
         }
 
         const { data } = await axios.get(url, {
-            timeout: 5000,
+            timeout: 30000,
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${session.accessToken}`,
