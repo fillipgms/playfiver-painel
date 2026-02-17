@@ -25,6 +25,7 @@ import {
     Phone,
     Translate,
 } from "@phosphor-icons/react/dist/ssr";
+import { WarningIcon } from "@phosphor-icons/react";
 
 interface Country {
     iso2: string;
@@ -426,6 +427,15 @@ const UpdateInfoModal = () => {
                                     )}
                                 </div>
                             )}
+                        </div>
+
+                        <div className="text-destructive">
+                            <WarningIcon className="float-left mt-1 mr-1" />
+                            <p>
+                                Atenção: Dados informados incorretamente podem
+                                levar à suspensão da conta. Certifique-se de
+                                fornecer informações precisas e verdadeiras.
+                            </p>
                         </div>
 
                         {error && (
