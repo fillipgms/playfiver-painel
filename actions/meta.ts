@@ -19,8 +19,6 @@ export async function registerOptions() {
             throw new Error("No valid data received from API");
         }
 
-        console.log(data);
-
         return data;
     } catch (error) {
         console.error("Failed to fetch agents:", error);

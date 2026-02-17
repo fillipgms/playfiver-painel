@@ -45,8 +45,6 @@ const PlayerAgentFilter = forwardRef((props: PlayerAgentFilterProps, ref) => {
         const params = new URLSearchParams(searchParams?.toString() || "");
         params.set("page", "1");
 
-        console.log(currentAgents);
-
         let newAgents: string[];
         if (currentAgents.includes(value)) {
             newAgents = currentAgents.filter((a) => a !== value);

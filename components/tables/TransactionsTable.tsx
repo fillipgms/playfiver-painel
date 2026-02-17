@@ -105,7 +105,7 @@ const cols: ColDef<TransactionProps>[] = [
                             "flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium",
                             isInfluencer
                                 ? "bg-primary/20 text-primary"
-                                : "bg-foreground/20 text-foreground/50"
+                                : "bg-foreground/20 text-foreground/50",
                         )}
                     >
                         {isInfluencer && (
@@ -173,7 +173,7 @@ const cols: ColDef<TransactionProps>[] = [
                     {isSuccess ? (
                         <div
                             className={twMerge(
-                                "flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium bg-[#95BD2B]/20 text-[#95BD2B]"
+                                "flex items-center gap-1 justify-center max-w-40 py-1 w-full text-center px-3 rounded text-sm font-medium bg-[#95BD2B]/20 text-[#95BD2B]",
                             )}
                         >
                             <div className="size-fit">
@@ -224,7 +224,7 @@ const cols: ColDef<TransactionProps>[] = [
             if (!p.value) return null;
             const date = new Date(p.value);
             const formatted = `${date.toLocaleDateString(
-                "pt-BR"
+                "pt-BR",
             )} às ${date.toLocaleTimeString("pt-BR", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -400,8 +400,6 @@ const TransactionsTable = ({
         );
     };
 
-    console.log(transactions);
-
     return (
         <div className="w-full space-y-6 overflow-hidden">
             <div className="space-y-4">
@@ -516,24 +514,24 @@ const TransactionsTable = ({
                                                 <>
                                                     {format(
                                                         parseDate(
-                                                            filters.dateStart
+                                                            filters.dateStart,
                                                         ) as Date,
-                                                        "dd/MM/yyyy"
+                                                        "dd/MM/yyyy",
                                                     )}{" "}
                                                     -{" "}
                                                     {format(
                                                         parseDate(
-                                                            filters.dateEnd
+                                                            filters.dateEnd,
                                                         ) as Date,
-                                                        "dd/MM/yyyy"
+                                                        "dd/MM/yyyy",
                                                     )}
                                                 </>
                                             ) : (
                                                 format(
                                                     parseDate(
-                                                        filters.dateStart
+                                                        filters.dateStart,
                                                     ) as Date,
-                                                    "PPP"
+                                                    "PPP",
                                                 )
                                             )
                                         ) : (
