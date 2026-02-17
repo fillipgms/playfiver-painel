@@ -73,8 +73,6 @@ const UpdateInfoModal = () => {
     useEffect(() => {
         if (!user) return;
 
-        console.log(user);
-
         const shouldOpenModal = user.data_update === true || !user.lang;
 
         if (shouldOpenModal) {
