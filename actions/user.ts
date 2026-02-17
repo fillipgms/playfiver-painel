@@ -55,6 +55,9 @@ export async function getUser() {
         const { data } = await axios.get(`${BASE_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${session.accessToken}` },
         });
+
+        console.log(data);
+
         return data as User;
     } catch (error) {
         if (axios.isAxiosError(error)) {
