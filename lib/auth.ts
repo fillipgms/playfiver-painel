@@ -135,7 +135,7 @@ export async function register(formData: FormData) {
             verification_code,
         });
 
-        console.log(response);
+        console.log("response: ", response);
 
         if (response.status === 200 || response.status === 201) {
             return {
@@ -152,6 +152,8 @@ export async function register(formData: FormData) {
     } catch (error) {
         const apiMessage = (error as { response?: { data?: { msg?: string } } })
             ?.response?.data?.msg;
+
+        console.log("api message: ", apiMessage);
 
         if (axios.isAxiosError(error) && error.response?.status === 422) {
             const responseData = error.response.data;
