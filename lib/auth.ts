@@ -71,6 +71,11 @@ export async function register(formData: FormData) {
         name: formData.get("name"),
         email: formData.get("email"),
         password: formData.get("password"),
+        nationality: formData.get("nationality"),
+        country: formData.get("country"),
+        phone: formData.get("phone"),
+        lang: formData.get("lang"),
+        document: formData.get("document"),
         confirmPassword: formData.get("confirmPassword"),
     });
 
@@ -82,7 +87,16 @@ export async function register(formData: FormData) {
         };
     }
 
-    const { name, email, password } = validationResult.data;
+    const {
+        name,
+        email,
+        password,
+        nationality,
+        country,
+        phone,
+        lang,
+        document,
+    } = validationResult.data;
     const verification_code = formData.get("verification_code") as string;
 
     const codeValidation = verifyCodeSchema.safeParse({ verification_code });
@@ -97,10 +111,28 @@ export async function register(formData: FormData) {
     }
 
     try {
-        const response = await axios({
-            method: "post",
-            url: `${BASE_URL}/auth/register`,
-            data: { name, email, password, verification_code },
+        console.log("test here", {
+            email,
+            name,
+            password,
+            nationality,
+            country,
+            phone,
+            lang,
+            document,
+            verification_code,
+        });
+
+        const response = await axios.post(`${BASE_URL}/auth/register`, {
+            email,
+            name,
+            password,
+            nationality,
+            country,
+            phone,
+            lang,
+            document,
+            verification_code,
         });
 
         if (response.status === 200 || response.status === 201) {
@@ -121,20 +153,10 @@ export async function register(formData: FormData) {
 
         if (axios.isAxiosError(error) && error.response?.status === 422) {
             const responseData = error.response.data;
+
             return {
                 success: false,
-                message: "Dados inválidos.",
-                errors: {
-                    name: [responseData.messages?.name || "Nome inválido."],
-                    email: [responseData.messages?.email || "Email inválido."],
-                    password: [
-                        responseData.messages?.password || "Senha inválida.",
-                    ],
-                    verification_code: [
-                        responseData.messages?.verification_code ||
-                            "Código inválido.",
-                    ],
-                },
+                message: responseData.msg || "Dados inválidos.",
             };
         }
 
