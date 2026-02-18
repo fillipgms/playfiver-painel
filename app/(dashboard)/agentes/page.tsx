@@ -12,13 +12,16 @@ export default function AgentesPage() {
     const [paginatedAgents, setPaginatedAgents] =
         useState<AgentsResponse | null>(null);
     const [agentHeight, setAgentHeight] = useState<number | undefined>(
-        undefined
+        undefined,
     );
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
 
     const loadAgents = async (current = page, query = search) => {
         const res = await getAgentsData({ page: current, search: query });
+
+        console.log(res);
+
         setPaginatedAgents(res);
         setAgents(res.data);
     };
@@ -92,7 +95,7 @@ export default function AgentesPage() {
                         onClick={() => {
                             const next = Math.min(
                                 paginatedAgents.last_page,
-                                page + 1
+                                page + 1,
                             );
                             setPage(next);
                             loadAgents(next, search);

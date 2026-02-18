@@ -61,6 +61,11 @@ export default function RegisterPage() {
         name: "",
         email: "",
         password: "",
+        nationality: "",
+        country: "",
+        phone: "",
+        lang: "",
+        document: "",
         confirmPassword: "",
     });
     const [verificationCode, setVerificationCode] = useState("");
@@ -87,6 +92,11 @@ export default function RegisterPage() {
                 name: formDataObj.get("name") as string,
                 email: formDataObj.get("email") as string,
                 password: formDataObj.get("password") as string,
+                nationality: formDataObj.get("nationality") as string,
+                country: formDataObj.get("country") as string,
+                phone: formDataObj.get("phone") as string,
+                lang: formDataObj.get("lang") as string,
+                document: formDataObj.get("document") as string,
                 confirmPassword: formDataObj.get("confirmPassword") as string,
             });
             setSuccess(result.message);
@@ -114,8 +124,8 @@ export default function RegisterPage() {
         formDataObj.append("nationality", selectedNationality);
         formDataObj.append("country", selectedCountryCode);
         formDataObj.append("lang", selectedLang);
-        formDataObj.append("phone", phone);
-        formDataObj.append("document", document);
+        formDataObj.append("phone", phone.replace(/\D/g, ""));
+        formDataObj.append("document", document.replace(/\D/g, ""));
 
         const result = await register(formDataObj);
 
@@ -313,7 +323,6 @@ export default function RegisterPage() {
                         </div>
                     </form>
                 </div>
-                <div className="md:w-1/2 w-full bg-radial from-primary to-[#005EBD] rounded-md overflow-hidden"></div>
             </main>
         );
     }
@@ -373,6 +382,7 @@ export default function RegisterPage() {
                                 </label>
                                 <Select
                                     value={selectedNationality}
+                                    name="nationality"
                                     onValueChange={setSelectedNationality}
                                 >
                                     <SelectTrigger className="w-full h-10 border-foreground/20 bg-background-secondary">
