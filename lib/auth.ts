@@ -135,6 +135,8 @@ export async function register(formData: FormData) {
             verification_code,
         });
 
+        console.log(response);
+
         if (response.status === 200 || response.status === 201) {
             return {
                 success: true,
