@@ -86,7 +86,7 @@ const GgrBadge = ({
     if (!ggrTable || ggrTable.length === 0) return null;
 
     const sortedLevels = [...ggrTable].sort(
-        (a, b) => parseFloat(b.above) - parseFloat(a.above)
+        (a, b) => parseFloat(b.above) - parseFloat(a.above),
     );
 
     let ggrRate = 0;
@@ -130,7 +130,7 @@ const Carteira = ({
         const fetchGGR = async () => {
             try {
                 const ggr = (await getWalletGGr(
-                    carteira.id
+                    carteira.id,
                 )) as GgrTableProps[];
                 setGgrTable(ggr);
             } catch {
@@ -155,7 +155,7 @@ const Carteira = ({
                     (totalAmount < 0 ? Math.abs(totalAmount) : 0),
             };
         },
-        { totalGanhos: 0, totalPerdidos: 0 }
+        { totalGanhos: 0, totalPerdidos: 0 },
     );
 
     const isDisabled = carteira.status !== 1;
@@ -198,7 +198,7 @@ const Carteira = ({
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-label={`Progresso do saldo: ${progress.toFixed(
-                            1
+                            1,
                         )}%`}
                     >
                         {progress > 0 && (
@@ -318,7 +318,7 @@ const Carteira = ({
                         disabled={isDisabled}
                         triggerClassName={twMerge(
                             "w-full",
-                            isDisabled ? "opacity-50 cursor-not-allowed " : ""
+                            isDisabled ? "opacity-50 cursor-not-allowed " : "",
                         )}
                     />
                     <Link

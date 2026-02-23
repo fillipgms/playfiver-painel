@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react/dist/ssr";
 
 const formatCurrencyBRL = (value: number): string =>
@@ -58,8 +59,24 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
     const sortedAgents = [...visibleAgents].sort((a, b) => {
         const totalA = parseWalletBalance(a.total);
         const totalB = parseWalletBalance(b.total);
-        return totalA - totalB; // Menor valor primeiro (maior perda)
+        return totalA - totalB;
     });
+
+    const allAgents = [...safeAgents].sort((a, b) => {
+        const totalA = parseWalletBalance(a.total);
+        const totalB = parseWalletBalance(b.total);
+        return totalA - totalB;
+    });
+
+    const [visible, setVisible] = useState(sortedAgents);
+
+    const handleChangeVisible = () => {
+        if (visible.length === sortedAgents.length) {
+            setVisible(allAgents);
+        } else {
+            setVisible(sortedAgents);
+        }
+    };
 
     return (
         <div className="space-y-3">
@@ -75,7 +92,7 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
             </div>
 
             <div className="space-y-2">
-                {sortedAgents.map((agent, index) => {
+                {visible.map((agent, index) => {
                     const betAmount = parseWalletBalance(agent.bet);
                     const winAmount = parseWalletBalance(agent.win);
                     const totalAmount = parseWalletBalance(agent.total);
@@ -148,11 +165,11 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
                 )}
 
                 {remainingCount > 0 && (
-                    <div className="text-center">
-                        <span className="text-xs text-foreground/50 bg-foreground/5 px-3 py-1 rounded-full">
-                            +{remainingCount} agente
-                            {remainingCount > 1 ? "s" : ""} restante
-                            {remainingCount > 1 ? "s" : ""}
+                    <div className="text-center" onClick={handleChangeVisible}>
+                        <span className="text-xs text-foreground/50 bg-foreground/5 px-3 py-1 rounded-full cursor-pointer">
+                            {visible.length === sortedAgents.length
+                                ? `+${remainingCount} agente${remainingCount > 1 ? "s" : ""} restante${remainingCount > 1 ? "s" : ""}`
+                                : "Ver Menos"}
                         </span>
                     </div>
                 )}
