@@ -168,7 +168,7 @@ const AgentList = ({ agents, maxVisible = 3 }: AgentListProps) => {
                     <div className="text-center" onClick={handleChangeVisible}>
                         <span className="text-xs text-foreground/50 bg-foreground/5 px-3 py-1 rounded-full cursor-pointer">
                             {visible.length === sortedAgents.length
-                                ? `+${remainingCount} agente${remainingCount > 1 ? "s" : ""} restante${remainingCount > 1 ? "s" : ""}`
+                                ? `Ver Mais`
                                 : "Ver Menos"}
                         </span>
                     </div>

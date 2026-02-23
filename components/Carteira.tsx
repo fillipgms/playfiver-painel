@@ -114,12 +114,89 @@ const GgrBadge = ({
 const TARGET_BALANCE = 100;
 
 const Carteira = ({
-    carteira,
+    // carteira,
     index,
 }: {
-    carteira: WalletProps;
+    // carteira: WalletProps;
     index: number;
 }) => {
+    const carteira = {
+        agents: [
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+            {
+                name: "teste",
+                bet: "10.00000000",
+                win: "10.00000000",
+                total: "10%",
+            },
+        ],
+        id: 1,
+        name: "Carteira PlayFiver (Clones)",
+        provedores: [
+            { id: 1, name: "PGSOFT" },
+            { id: 2, name: "PRAGMATIC" },
+            { id: 3, name: "SPRIBE" },
+            { id: 7, name: "HABANERO" },
+            { id: 10, name: "PLAYSON" },
+            { id: 12, name: "TOPTREND" },
+            { id: 13, name: "DREAMTECH" },
+            { id: 14, name: "EVOPLAY" },
+            { id: 15, name: "BOOONGO" },
+            { id: 16, name: "CQ9" },
+            { id: 17, name: "REELKINGDOM" },
+            { id: 116, name: "FATPANDA" },
+        ],
+        saldo: "10.00000000",
+        status: 1,
+    };
+
     const [ggrTable, setGgrTable] = useState<GgrTableProps[] | undefined>();
     const [loadingGGR, setLoadingGGR] = useState(true);
 
