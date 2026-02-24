@@ -105,6 +105,7 @@ export default function RegisterPage() {
             setError(result.message || "Ocorreu um erro ao solicitar o código");
             if (result.errors) {
                 setFieldErrors(result.errors);
+                console.log("fieldErrors set:", result.errors);
             }
         }
     };
@@ -129,6 +130,8 @@ export default function RegisterPage() {
 
         const result = await register(formDataObj);
 
+        console.log(result);
+
         if (result.success) {
             const result = await signIn(formDataObj);
             if (result.success) {
@@ -141,7 +144,9 @@ export default function RegisterPage() {
             }
         } else {
             setError(result.message || "Ocorreu um erro ao criar a conta");
+
             if (result.errors) {
+                setStep("form");
                 setFieldErrors(result.errors as Record<string, string[]>);
             }
         }
@@ -631,6 +636,26 @@ export default function RegisterPage() {
 
                             <div className="text-sm text-[#E53935]">
                                 {error && <p>Erro: {error}</p>}
+                                {Object.entries(fieldErrors)
+                                    .filter(([key]) => {
+                                        const visibleFields = [
+                                            "name",
+                                            "email",
+                                            "nationality",
+                                            "phone",
+                                            "countryCode",
+                                            "lang",
+                                            "password",
+                                            "confirmPassword",
+                                            ...(isBrazilian
+                                                ? ["document"]
+                                                : []),
+                                        ];
+                                        return !visibleFields.includes(key);
+                                    })
+                                    .map(([key, messages]) => (
+                                        <p key={key}>{messages[0]}</p>
+                                    ))}
                             </div>
 
                             <div className="text-sm text-green-600">
