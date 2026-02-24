@@ -48,11 +48,9 @@ export async function updateUserData({
     document,
 }: UpdateUserDataParams) {
     const session = await getSession();
-
     if (!session) {
         redirect("/login");
     }
-
     try {
         const { data } = await axios.put(
             `${BASE_URL}/auth/data-update`,
@@ -73,14 +71,12 @@ export async function updateUserData({
         );
 
         if (!data) {
-            throw new Error("No valid data received from API");
+            return { success: false, error: "No valid data received from API" };
         }
 
-        return data;
+        return { success: true, data };
     } catch (error) {
         console.error("Failed to update user data:", error);
-        const apiMessage = (error as { response?: { data?: { msg?: string } } })
-            ?.response?.data?.msg;
 
         if (
             axios.isAxiosError(error) &&
@@ -89,12 +85,17 @@ export async function updateUserData({
             redirect("/login");
         }
 
-        throw new Error(
-            apiMessage ||
+        const apiMessage = (error as { response?: { data?: { msg?: string } } })
+            ?.response?.data?.msg;
+
+        return {
+            success: false,
+            error:
+                apiMessage ||
                 getFriendlyHttpErrorMessage(
                     error,
                     "Falha ao atualizar dados do usuário",
                 ),
-        );
+        };
     }
 }

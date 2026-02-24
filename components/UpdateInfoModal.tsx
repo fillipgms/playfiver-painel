@@ -222,9 +222,9 @@ const UpdateInfoModal = () => {
             await updateUserData({
                 nationality: selectedNationality,
                 country: selectedCountryCode,
-                phone: phone.replace(/\D/g, ""), // Send only numbers
+                phone: phone.replace(/\D/g, ""),
                 lang: selectedLang.toUpperCase(),
-                ...(document && { document: document.replace(/\D/g, "") }), // Send only numbers
+                ...(document && { document: document.replace(/\D/g, "") }),
             });
 
             await refreshSession();
