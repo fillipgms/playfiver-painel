@@ -43,14 +43,29 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
     const dateEnd = sp.dateEnd || "";
 
     const res = await getLogsData(page, dateStart, dateEnd, agent);
-    const logs = res.data as Array<{
-        id: number;
-        agente?: { code: string; memo?: string };
-        gravity?: string;
-        type?: string;
-        data?: { titulo?: string; mensagem?: string; status?: number };
-        created_at: string;
-    }>;
+    // const logs = res.data as Array<{
+    //     id: number;
+    //     agente?: { code: string; memo?: string };
+    //     gravity?: string;
+    //     type?: string;
+    //     data?: { titulo?: string; mensagem?: string; status?: number };
+    //     created_at: string;
+    // }>;
+
+    const logs = [
+        {
+            id: 1,
+            agente: { code: "agente code", memo: "nome do agente" },
+            gravity: "hight",
+            type: "game_open",
+            data: {
+                titulo: "houve um erro",
+                mensagem: "mensagem teste",
+                status: "open",
+            },
+            created_at: String(new Date()),
+        },
+    ];
 
     const grouped: Record<string, typeof logs> = {};
     for (const item of logs) {
@@ -60,7 +75,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
     }
 
     const dayKeys = Object.keys(grouped).sort(
-        (a, b) => new Date(b).getTime() - new Date(a).getTime()
+        (a, b) => new Date(b).getTime() - new Date(a).getTime(),
     );
 
     return (
@@ -81,7 +96,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
                                 .sort(
                                     (a, b) =>
                                         new Date(b.created_at).getTime() -
-                                        new Date(a.created_at).getTime()
+                                        new Date(a.created_at).getTime(),
                                 )
                                 .map((log, i) => {
                                     const gravity = (
