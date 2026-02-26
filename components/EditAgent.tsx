@@ -22,6 +22,7 @@ import { Dialog, DialogContent } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { ScrollArea } from "./ui/scroll-area";
+import { Slider } from "./ui/slider";
 
 const options = [
     { label: "Real Brasileiro (BRL)", value: "BRL" },
@@ -331,25 +332,24 @@ const EditAgentForm = ({ agent, onClose, onSuccess }: EditAgentProps) => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <input
-                                        type="range"
+                                    <Slider
                                         min={1}
                                         max={100}
                                         step={0.01}
-                                        value={rtpNumber}
-                                        onChange={(e) =>
+                                        value={[rtpNumber]}
+                                        onValueChange={(e) =>
                                             setForm((prev) => ({
                                                 ...prev,
-                                                rtp: String(
-                                                    (
-                                                        e.target as HTMLInputElement
-                                                    ).value
-                                                ),
+                                                rtp: String(e),
                                             }))
                                         }
                                         disabled={submitting}
-                                        className="w-full h-2 !bg-foreground/20 dark:!bg-foreground/10 rounded-lg appearance-none cursor-pointer slider"
                                     />
+
+                                    {/* <input
+                                        type="range"
+                                        className="w-full h-2 !bg-foreground/20 dark:!bg-foreground/10 rounded-lg appearance-none cursor-pointer slider"
+                                    /> */}
                                     <div className="flex justify-between text-xs text-foreground/60">
                                         <span>1%</span>
                                         <span className="font-medium text-primary">
