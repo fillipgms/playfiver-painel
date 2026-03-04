@@ -219,13 +219,22 @@ const UpdateInfoModal = () => {
                 return;
             }
 
-            await updateUserData({
+            const res = await updateUserData({
                 nationality: selectedNationality,
                 country: selectedCountryCode,
                 phone: phone.replace(/\D/g, ""),
                 lang: selectedLang.toUpperCase(),
                 ...(document && { document: document.replace(/\D/g, "") }),
             });
+
+            console.log(res);
+
+            if (!res.success || res.error) {
+                setError(
+                    res.error || "Ocorreu um erro ao atualizar informações",
+                );
+                return;
+            }
 
             await refreshSession();
             setOpen(false);
